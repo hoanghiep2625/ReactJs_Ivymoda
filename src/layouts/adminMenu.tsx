@@ -20,12 +20,13 @@ const AdminMenu: React.FC<AdminMenuProps> = ({ className }) => {
     return (
         <aside className={`bg-[#000000] text-white w-64 h-full p-6 ${className || ''}`}>
             <ul className="space-y-4">
-                {menuItems.map((item) => (
+                {menuItems.map(item => (
                     <li key={item.name}>
                         <NavLink
                             to={item.url}
                             className={({ isActive }) =>
-                                `flex items-center p-3 text-sm font-medium transition-colors duration-200 ${isActive ? 'bg-[#1A1A1A]' : 'hover:bg-[#1A1A1A]'
+                                `flex items-center p-3 text-sm font-medium transition-colors duration-200 ${
+                                    isActive ? 'bg-[#1A1A1A]' : 'hover:bg-[#1A1A1A]'
                                 }`
                             }
                         >

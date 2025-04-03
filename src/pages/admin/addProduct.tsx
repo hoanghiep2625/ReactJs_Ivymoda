@@ -1,54 +1,55 @@
-import React, { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import AdminFooter from "../../layouts/adminFooter";
-import AdminHeader from "../../layouts/adminHeader";
-import AdminMenu from "../../layouts/adminMenu";
-import CategorySelector from "./CategorySelector";
-import { IProduct, IColor, IImages, ISize } from "../../types/products";
-import { AxiosError } from "axios";
-import { Upload, message, Modal } from "antd";
-import type { UploadFile, UploadProps, UploadChangeParam } from "antd/es/upload/interface";
-import { PlusOutlined } from "@ant-design/icons";
-import { addItem } from "../../api/provider";
+import React, { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import AdminFooter from '../../layouts/adminFooter';
+import AdminHeader from '../../layouts/adminHeader';
+import AdminMenu from '../../layouts/adminMenu';
+import CategorySelector from './CategorySelector';
+import { IProduct } from '../../types/product';
+import { IProductVariant, IColor, ISize, IImages } from '../../types/productVariant';
+import { AxiosError } from 'axios';
+import { Upload, message, Modal } from 'antd';
+import type { UploadFile, UploadProps, UploadChangeParam } from 'antd/es/upload/interface';
+import { PlusOutlined } from '@ant-design/icons';
+import { postItem } from '../../api/provider';
 
 const AddProduct: React.FC = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const generateRandomSKU = (): string => {
-        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        let result = "";
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
         for (let i = 0; i < 7; i++) {
             result += characters.charAt(Math.floor(Math.random() * characters.length));
         }
         return result;
     };
 
-    const sizes = ["S", "M", "L", "XL", "XXL"];
+    const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
     const colors = [
-        { name: "Đen", code: "#000000" },
-        { name: "Trắng", code: "#FFFFFF" },
-        { name: "Xanh dương", code: "#0000FF" },
-        { name: "Vàng", code: "#FFFF00" },
-        { name: "Hồng", code: "#FF69B4" },
-        { name: "Đỏ", code: "#FF0000" },
-        { name: "Xám", code: "#808080" },
-        { name: "Be", code: "#F5F5DC" },
-        { name: "Nâu", code: "#8B4513" },
-        { name: "Xanh lá", code: "#008000" },
-        { name: "Cam", code: "#FFA500" },
-        { name: "Tím", code: "#800080" },
+        { name: 'Đen', code: '#000000' },
+        { name: 'Trắng', code: '#FFFFFF' },
+        { name: 'Xanh dương', code: '#0000FF' },
+        { name: 'Vàng', code: '#FFFF00' },
+        { name: 'Hồng', code: '#FF69B4' },
+        { name: 'Đỏ', code: '#FF0000' },
+        { name: 'Xám', code: '#808080' },
+        { name: 'Be', code: '#F5F5DC' },
+        { name: 'Nâu', code: '#8B4513' },
+        { name: 'Xanh lá', code: '#008000' },
+        { name: 'Cam', code: '#FFA500' },
+        { name: 'Tím', code: '#800080' },
     ];
 
-    const [name, setName] = useState<string>("");
+    const [name, setName] = useState<string>('');
     const [price, setPrice] = useState<number>(0);
     const [sku] = useState<string>(generateRandomSKU());
-    const [categoryId, setCategoryId] = useState<string>("");
+    const [categoryId, setCategoryId] = useState<string>('');
     const [categoryAncestors, setCategoryAncestors] = useState<string[]>([]);
-    const [selectedColor, setSelectedColor] = useState<string>("");
-    const [hexColor, setHexColor] = useState<string>("#000000");
-    const [colorName, setColorName] = useState<string>("");
+    const [selectedColor, setSelectedColor] = useState<string>('');
+    const [hexColor, setHexColor] = useState<string>('#000000');
+    const [colorName, setColorName] = useState<string>('');
     const [productColors, setProductColors] = useState<IColor[]>([]);
     const [sizeStocks, setSizeStocks] = useState<{ [key: string]: number }>(
         sizes.reduce((acc, size) => ({ ...acc, [size]: 0 }), {})
@@ -62,8 +63,8 @@ const AddProduct: React.FC = () => {
         hover: [],
         product: [],
     });
-    const [shortDescription, setShortDescription] = useState<string>("");
-    const [description, setDescription] = useState<string>("");
+    const [shortDescription, setShortDescription] = useState<string>('');
+    const [description, setDescription] = useState<string>('');
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
@@ -74,19 +75,19 @@ const AddProduct: React.FC = () => {
 
     const mutation = useMutation<IProduct, Error, FormData>({
         mutationFn: (formData: FormData) =>
-            addItem({ namespace: "admin", endpoint: "products", values: formData }),
+            postItem({ namespace: 'admin/products', values: formData }),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
-            navigate("/admin/products");
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+            navigate('/admin/products');
         },
-        onError: (error) => {
+        onError: error => {
             const axiosError = error as AxiosError;
             const errorData = axiosError.response?.data as { errors?: string[] } | undefined;
-            console.error("Lỗi từ server:", errorData);
+            console.error('Lỗi từ server:', errorData);
             if (errorData?.errors) {
-                alert("Lỗi validation: " + errorData.errors.join(", "));
+                alert('Lỗi validation: ' + errorData.errors.join(', '));
             } else {
-                alert("Có lỗi xảy ra khi thêm sản phẩm!");
+                alert('Có lỗi xảy ra khi thêm sản phẩm!');
             }
         },
     });
@@ -103,7 +104,7 @@ const AddProduct: React.FC = () => {
 
     const handleAddColor = () => {
         if (productColors.length > 0) {
-            alert("Chỉ được thêm một màu!");
+            alert('Chỉ được thêm một màu!');
             return;
         }
         if (colorName && hexColor) {
@@ -113,44 +114,45 @@ const AddProduct: React.FC = () => {
                 colorName,
             };
             setProductColors([newColor]);
-            setColorName("");
-            console.log("Màu đã thêm:", newColor);
+            setColorName('');
+            console.log('Màu đã thêm:', newColor);
         }
     };
 
     const handleStockChange = (size: string, value: string) => {
-        setSizeStocks((prev) => ({
+        setSizeStocks(prev => ({
             ...prev,
-            [size]: value === "" ? 0 : Number(value),
+            [size]: value === '' ? 0 : Number(value),
         }));
     };
 
-    const handleImageChange = (type: "main" | "hover" | "product") => (info: UploadChangeParam<UploadFile>) => {
-        let newFileList = [...info.fileList];
+    const handleImageChange =
+        (type: 'main' | 'hover' | 'product') => (info: UploadChangeParam<UploadFile>) => {
+            let newFileList = [...info.fileList];
 
-        // Chỉ cắt xuống 1 ảnh cho main và hover
-        if (type !== "product") {
-            newFileList = newFileList.slice(-1);
-        }
-
-        newFileList = newFileList.map(file => {
-            if (file.response) {
-                file.url = file.response.url;
+            // Chỉ cắt xuống 1 ảnh cho main và hover
+            if (type !== 'product') {
+                newFileList = newFileList.slice(-1);
             }
-            return file;
-        });
 
-        setFileList(prev => ({
-            ...prev,
-            [type]: newFileList
-        }));
+            newFileList = newFileList.map(file => {
+                if (file.response) {
+                    file.url = file.response.url;
+                }
+                return file;
+            });
 
-        if (info.file.status === 'done') {
-            message.success(`${info.file.name} file uploaded successfully`);
-        } else if (info.file.status === 'error') {
-            message.error(`${info.file.name} file upload failed.`);
-        }
-    };
+            setFileList(prev => ({
+                ...prev,
+                [type]: newFileList,
+            }));
+
+            if (info.file.status === 'done') {
+                message.success(`${info.file.name} file uploaded successfully`);
+            } else if (info.file.status === 'error') {
+                message.error(`${info.file.name} file upload failed.`);
+            }
+        };
 
     const handlePreview = async (file: UploadFile) => {
         if (!file.url && !file.preview) {
@@ -168,7 +170,7 @@ const AddProduct: React.FC = () => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => resolve(reader.result as string);
-            reader.onerror = (error) => reject(error);
+            reader.onerror = error => reject(error);
         });
 
     const uploadButton = (
@@ -182,35 +184,35 @@ const AddProduct: React.FC = () => {
         e.preventDefault();
 
         if (productColors.length === 0) {
-            alert("Vui lòng thêm ít nhất một màu!");
+            alert('Vui lòng thêm ít nhất một màu!');
             return;
         }
 
-        const sizesArray: ISize[] = sizes.map((size) => ({
-            size,
+        const sizesArray: ISize[] = sizes.map(size => ({
+            size: size as 'S' | 'M' | 'L' | 'XL' | 'XXL',
             stock: sizeStocks[size],
         }));
 
         const formData = new FormData();
-        formData.append("name", name);
-        formData.append("price", price.toString());
-        formData.append("sku", sku);
-        formData.append("categoryId", categoryId);
-        formData.append("categoryAncestors", JSON.stringify(categoryAncestors));
-        formData.append("colors", JSON.stringify(productColors));
-        formData.append("sizes", JSON.stringify(sizesArray));
-        formData.append("shortDescription", shortDescription);
-        formData.append("description", description);
+        formData.append('name', name);
+        formData.append('price', price.toString());
+        formData.append('sku', sku);
+        formData.append('categoryId', categoryId);
+        formData.append('categoryAncestors', JSON.stringify(categoryAncestors));
+        formData.append('colors', JSON.stringify(productColors));
+        formData.append('sizes', JSON.stringify(sizesArray));
+        formData.append('shortDescription', shortDescription);
+        formData.append('description', description);
 
         if (fileList.main.length > 0 && fileList.main[0].originFileObj) {
-            formData.append("mainImage", fileList.main[0].originFileObj);
+            formData.append('mainImage', fileList.main[0].originFileObj);
         }
         if (fileList.hover.length > 0 && fileList.hover[0].originFileObj) {
-            formData.append("hoverImage", fileList.hover[0].originFileObj);
+            formData.append('hoverImage', fileList.hover[0].originFileObj);
         }
-        fileList.product.forEach((file) => {
+        fileList.product.forEach(file => {
             if (file.originFileObj) {
-                formData.append("productImages", file.originFileObj);
+                formData.append('productImages', file.originFileObj);
             }
         });
 
@@ -225,31 +227,39 @@ const AddProduct: React.FC = () => {
                 <main className="flex-1 overflow-auto p-8 bg-white text-black">
                     <div className="flex-1 flex flex-col">
                         <div className="bg-white p-8 shadow-lg">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-6">Thêm Sản Phẩm Mới</h2>
+                            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                                Thêm Sản Phẩm Mới
+                            </h2>
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label
+                                            htmlFor="name"
+                                            className="block text-sm font-medium text-gray-700 mb-1"
+                                        >
                                             Tên sản phẩm
                                         </label>
                                         <input
                                             type="text"
                                             id="name"
                                             value={name}
-                                            onChange={(e) => setName(e.target.value)}
+                                            onChange={e => setName(e.target.value)}
                                             className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                                             required
                                         />
                                     </div>
                                     <div>
-                                        <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label
+                                            htmlFor="price"
+                                            className="block text-sm font-medium text-gray-700 mb-1"
+                                        >
                                             Giá
                                         </label>
                                         <input
                                             type="number"
                                             id="price"
                                             value={price}
-                                            onChange={(e) => setPrice(Number(e.target.value))}
+                                            onChange={e => setPrice(Number(e.target.value))}
                                             className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                                             required
                                         />
@@ -265,7 +275,10 @@ const AddProduct: React.FC = () => {
 
                                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                                     <div>
-                                        <label htmlFor="colorSelect" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label
+                                            htmlFor="colorSelect"
+                                            className="block text-sm font-medium text-gray-700 mb-1"
+                                        >
                                             Chọn màu sắc
                                         </label>
                                         <select
@@ -275,7 +288,7 @@ const AddProduct: React.FC = () => {
                                             className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                                         >
                                             <option value="">Chọn màu</option>
-                                            {colors.map((color) => (
+                                            {colors.map(color => (
                                                 <option key={color.code} value={color.code}>
                                                     {color.name}
                                                 </option>
@@ -283,7 +296,10 @@ const AddProduct: React.FC = () => {
                                         </select>
                                     </div>
                                     <div>
-                                        <label htmlFor="colorHex" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label
+                                            htmlFor="colorHex"
+                                            className="block text-sm font-medium text-gray-700 mb-1"
+                                        >
                                             Tông màu (Hex)
                                         </label>
                                         <input
@@ -295,7 +311,10 @@ const AddProduct: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label htmlFor="hexInput" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label
+                                            htmlFor="hexInput"
+                                            className="block text-sm font-medium text-gray-700 mb-1"
+                                        >
                                             Mã màu (Hex)
                                         </label>
                                         <input
@@ -308,14 +327,17 @@ const AddProduct: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label htmlFor="colorName" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label
+                                            htmlFor="colorName"
+                                            className="block text-sm font-medium text-gray-700 mb-1"
+                                        >
                                             Tên màu sắc
                                         </label>
                                         <input
                                             type="text"
                                             id="colorName"
                                             value={colorName}
-                                            onChange={(e) => setColorName(e.target.value)}
+                                            onChange={e => setColorName(e.target.value)}
                                             className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                                             placeholder="Nhập tên màu"
                                         />
@@ -323,8 +345,11 @@ const AddProduct: React.FC = () => {
                                             type="button"
                                             onClick={handleAddColor}
                                             disabled={productColors.length > 0}
-                                            className={`mt-2 px-4 py-2 ${productColors.length > 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-black'
-                                                } text-white rounded-md`}
+                                            className={`mt-2 px-4 py-2 ${
+                                                productColors.length > 0
+                                                    ? 'bg-gray-400 cursor-not-allowed'
+                                                    : 'bg-black'
+                                            } text-white rounded-md`}
                                         >
                                             Thêm màu
                                         </button>
@@ -332,8 +357,10 @@ const AddProduct: React.FC = () => {
                                 </div>
                                 <div>
                                     <ul>
-                                        {productColors.map((color) => (
-                                            <li key={color._id}>{`${color.colorName} (${color.actualColor})`}</li>
+                                        {productColors.map(color => (
+                                            <li
+                                                key={color.colorName}
+                                            >{`${color.colorName} (${color.actualColor})`}</li>
                                         ))}
                                     </ul>
                                 </div>
@@ -346,8 +373,11 @@ const AddProduct: React.FC = () => {
                                     <table className="w-full border-collapse border border-gray-300">
                                         <thead>
                                             <tr className="bg-gray-200">
-                                                {sizes.map((size) => (
-                                                    <th key={size} className="border border-gray-300 px-4 py-2 text-center">
+                                                {sizes.map(size => (
+                                                    <th
+                                                        key={size}
+                                                        className="border border-gray-300 px-4 py-2 text-center"
+                                                    >
                                                         {size}
                                                     </th>
                                                 ))}
@@ -355,12 +385,24 @@ const AddProduct: React.FC = () => {
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                {sizes.map((size) => (
-                                                    <td key={size} className="border border-gray-300 px-4 py-2">
+                                                {sizes.map(size => (
+                                                    <td
+                                                        key={size}
+                                                        className="border border-gray-300 px-4 py-2"
+                                                    >
                                                         <input
                                                             type="number"
-                                                            value={sizeStocks[size] === 0 ? "" : sizeStocks[size]}
-                                                            onChange={(e) => handleStockChange(size, e.target.value)}
+                                                            value={
+                                                                sizeStocks[size] === 0
+                                                                    ? ''
+                                                                    : sizeStocks[size]
+                                                            }
+                                                            onChange={e =>
+                                                                handleStockChange(
+                                                                    size,
+                                                                    e.target.value
+                                                                )
+                                                            }
                                                             placeholder="0"
                                                             className="w-full p-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                                                         />
@@ -379,7 +421,7 @@ const AddProduct: React.FC = () => {
                                         <Upload
                                             listType="picture-card"
                                             fileList={fileList.main}
-                                            onChange={handleImageChange("main")}
+                                            onChange={handleImageChange('main')}
                                             onPreview={handlePreview}
                                             maxCount={1}
                                             beforeUpload={() => false}
@@ -394,7 +436,7 @@ const AddProduct: React.FC = () => {
                                         <Upload
                                             listType="picture-card"
                                             fileList={fileList.hover}
-                                            onChange={handleImageChange("hover")}
+                                            onChange={handleImageChange('hover')}
                                             onPreview={handlePreview}
                                             maxCount={1}
                                             beforeUpload={() => false}
@@ -409,7 +451,7 @@ const AddProduct: React.FC = () => {
                                         <Upload
                                             listType="picture-card"
                                             fileList={fileList.product}
-                                            onChange={handleImageChange("product")}
+                                            onChange={handleImageChange('product')}
                                             onPreview={handlePreview}
                                             multiple
                                             beforeUpload={() => false}
@@ -420,26 +462,32 @@ const AddProduct: React.FC = () => {
                                 </div>
 
                                 <div>
-                                    <label htmlFor="shortDescription" className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label
+                                        htmlFor="shortDescription"
+                                        className="block text-sm font-medium text-gray-700 mb-1"
+                                    >
                                         Mô tả ngắn
                                     </label>
                                     <textarea
                                         id="shortDescription"
                                         value={shortDescription}
-                                        onChange={(e) => setShortDescription(e.target.value)}
+                                        onChange={e => setShortDescription(e.target.value)}
                                         rows={3}
                                         className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                                     />
                                 </div>
 
                                 <div>
-                                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label
+                                        htmlFor="description"
+                                        className="block text-sm font-medium text-gray-700 mb-1"
+                                    >
                                         Chi tiết sản phẩm
                                     </label>
                                     <textarea
                                         id="description"
                                         value={description}
-                                        onChange={(e) => setDescription(e.target.value)}
+                                        onChange={e => setDescription(e.target.value)}
                                         rows={6}
                                         className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                                     />
@@ -458,7 +506,7 @@ const AddProduct: React.FC = () => {
                                         disabled={mutation.isPending}
                                         className="px-4 py-2 bg-black hover:bg-gray-700 text-white rounded-md shadow-sm transition-colors"
                                     >
-                                        {mutation.isPending ? "Đang thêm..." : "Thêm sản phẩm"}
+                                        {mutation.isPending ? 'Đang thêm...' : 'Thêm sản phẩm'}
                                     </button>
                                 </div>
                             </form>

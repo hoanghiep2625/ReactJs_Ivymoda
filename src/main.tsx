@@ -8,7 +8,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { AuthWrapper } from "./components/context/auth.context.tsx";
+import { AuthWrapper } from "./context/auth.context.tsx";
 
 // Tạo QueryClient instance
 const queryClient = new QueryClient();

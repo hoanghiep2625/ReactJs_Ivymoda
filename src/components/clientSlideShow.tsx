@@ -14,7 +14,7 @@ const Slideshow: React.FC<SlideshowProps> = ({
     images,
     spaceBetween = 50,
     slidesPerView = 1,
-    autoplayDelay = 2500
+    autoplayDelay = 2500,
 }) => {
     return (
         <Swiper

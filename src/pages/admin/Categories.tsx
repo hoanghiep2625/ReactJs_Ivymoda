@@ -1,10 +1,11 @@
-import React, { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getCategories, deleteCategory } from "../../services/categoryService";
-import { Category } from "../../types/categories";
-import AdminHeader from "../../layouts/adminHeader";
-import AdminMenu from "../../layouts/adminMenu";
-import AddCategoryForm from "./addCategory";
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getCategories, deleteCategory } from '../../services/categoryService';
+import { Category } from '../../types/categories';
+import AdminHeader from '../../layouts/adminHeader';
+import AdminMenu from '../../layouts/adminMenu';
+import AddCategoryForm from './addCategory';
+import Loading from '../../components/loading';
 
 interface CategoryResponse {
     docs: Category[];
@@ -19,7 +20,7 @@ interface TableRowProps {
 
 const TableRow: React.FC<TableRowProps> = ({ category, categories, level, onDelete }) => {
     const [expanded, setExpanded] = useState(false);
-    const children = categories.filter((cat) => cat.parentId === category._id);
+    const children = categories.filter(cat => cat.parentId === category._id);
 
     return (
         <>
@@ -31,7 +32,7 @@ const TableRow: React.FC<TableRowProps> = ({ category, categories, level, onDele
                                 onClick={() => setExpanded(!expanded)}
                                 className="mr-2 bg-gray-200 text-black hover:bg-gray-300 px-2 py-1 rounded"
                             >
-                                {expanded ? "–" : "+"}
+                                {expanded ? '–' : '+'}
                             </button>
                         )}
                         <span className="font-semibold text-gray-800">{category.name}</span>
@@ -40,8 +41,9 @@ const TableRow: React.FC<TableRowProps> = ({ category, categories, level, onDele
                 <td className="border px-4 py-2 text-center">{category.level}</td>
                 <td className="border px-4 py-2">
                     {category.parentId
-                        ? categories.find((cat) => cat._id === category.parentId)?.name || "Không xác định"
-                        : "Không có"}
+                        ? categories.find(cat => cat._id === category.parentId)?.name ||
+                          'Không xác định'
+                        : 'Không có'}
                 </td>
                 <td className="border px-4 py-2 text-center">
                     {new Date(category.createdAt).toLocaleDateString()}
@@ -50,7 +52,6 @@ const TableRow: React.FC<TableRowProps> = ({ category, categories, level, onDele
                     {new Date(category.updatedAt).toLocaleDateString()}
                 </td>
                 <td className="border px-4 py-2">
-
                     <button
                         className="bg-black text-white hover:bg-gray-800 px-2 py-1 rounded mr-2"
                         onClick={() => alert(`Chỉnh sửa: ${category.name}`)}
@@ -60,7 +61,7 @@ const TableRow: React.FC<TableRowProps> = ({ category, categories, level, onDele
                     <button
                         className="bg-black text-white hover:bg-gray-800 px-2 py-1 rounded"
                         onClick={() => {
-                            if (window.confirm("Bạn có chắc muốn xóa danh mục này?")) {
+                            if (window.confirm('Bạn có chắc muốn xóa danh mục này?')) {
                                 onDelete(category._id);
                             }
                         }}
@@ -70,7 +71,7 @@ const TableRow: React.FC<TableRowProps> = ({ category, categories, level, onDele
                 </td>
             </tr>
             {expanded &&
-                children.map((child) => (
+                children.map(child => (
                     <TableRow
                         key={child._id}
                         category={child}
@@ -87,27 +88,27 @@ const Categories: React.FC = () => {
     const queryClient = useQueryClient();
 
     const { data, isLoading, isError, error } = useQuery<CategoryResponse>({
-        queryKey: ["categories"],
+        queryKey: ['categories'],
         queryFn: getCategories,
     });
 
     const deleteMutation = useMutation({
         mutationFn: deleteCategory,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["categories"] });
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
         },
-        onError: (error) => {
-            console.error("Lỗi khi xóa danh mục:", error);
+        onError: error => {
+            console.error('Lỗi khi xóa danh mục:', error);
         },
     });
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    if (isLoading) return <div>Đang tải danh mục...</div>;
+    if (isLoading) return <Loading />;
     if (isError) return <div>Lỗi: {(error as Error).message}</div>;
 
     const categoriesData: Category[] = data?.docs || [];
-    const rootCategories = categoriesData.filter((cat) => !cat.parentId);
+    const rootCategories = categoriesData.filter(cat => !cat.parentId);
 
     const handleDelete = (id: string) => {
         deleteMutation.mutate(id);
@@ -130,7 +131,9 @@ const Categories: React.FC = () => {
                             </button>
                         </div>
                         <div className="max-w-6xl p-4">
-                            <h2 className="text-2xl font-bold mb-4 text-center">Quản Lý Danh Mục</h2>
+                            <h2 className="text-2xl font-bold mb-4 text-center">
+                                Quản Lý Danh Mục
+                            </h2>
                             <table className="min-w-full border-collapse border border-gray-300">
                                 <thead>
                                     <tr className="bg-gray-100">
@@ -138,13 +141,15 @@ const Categories: React.FC = () => {
                                         <th className="border px-4 py-2 text-center">Cấp độ</th>
                                         <th className="border px-4 py-2 text-left">Danh mục cha</th>
                                         <th className="border px-4 py-2 text-center">Ngày tạo</th>
-                                        <th className="border px-4 py-2 text-center">Ngày cập nhật</th>
+                                        <th className="border px-4 py-2 text-center">
+                                            Ngày cập nhật
+                                        </th>
                                         <th className="border px-4 py-2 text-center">Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {rootCategories.length > 0 ? (
-                                        rootCategories.map((cat) => (
+                                        rootCategories.map(cat => (
                                             <TableRow
                                                 key={cat._id}
                                                 category={cat}
@@ -155,7 +160,10 @@ const Categories: React.FC = () => {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan={6} className="border px-4 py-2 text-center">
+                                            <td
+                                                colSpan={6}
+                                                className="border px-4 py-2 text-center"
+                                            >
                                                 Không có danh mục nào
                                             </td>
                                         </tr>

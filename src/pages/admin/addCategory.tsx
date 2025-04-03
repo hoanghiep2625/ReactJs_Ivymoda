@@ -1,60 +1,58 @@
-import React, { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getCategories, addCategory } from "../../services/categoryService";
-import { Category } from "../../types/categories";
-import { getList } from "../../api/provider";
+import React, { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { getCategories, addCategory } from '../../services/categoryService';
+import { Category } from '../../types/categories';
+import { getList } from '../../api/provider';
+import Loading from '../../components/loading';
 
 const AddCategoryForm: React.FC = () => {
-    const [name, setName] = useState<string>("");
+    const [name, setName] = useState<string>('');
     const [level, setLevel] = useState<number>(1);
     const [parentLevel1Id, setParentLevel1Id] = useState<string | null>(null);
     const [parentId, setParentId] = useState<string | null>(null);
     const queryClient = useQueryClient();
 
     const { data, isLoading, error } = useQuery({
-        queryKey: ["categories"],
-        queryFn: async () =>
-            getList({ namespace: "categories", endpoint: "categories" }),
+        queryKey: ['categories'],
+        queryFn: async () => getList({ namespace: 'categories' }),
         staleTime: 60 * 1000,
     });
 
     const mutation = useMutation({
         mutationFn: addCategory,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["categories"] });
-            setName("");
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
+            setName('');
             setParentLevel1Id(null);
             setParentId(null);
             setLevel(1);
         },
-        onError: (error) => {
-            console.error("Lỗi khi thêm danh mục:", error);
+        onError: error => {
+            console.error('Lỗi khi thêm danh mục:', error);
         },
     });
 
-    if (isLoading) return <div>Đang tải danh mục...</div>;
+    if (isLoading) return <Loading />;
     if (error) return <div>Lỗi: {(error as Error).message}</div>;
 
     const categoriesData: Category[] = data?.docs || [];
-    const level1Categories = categoriesData.filter((cat) => cat.level === 1);
+    const level1Categories = categoriesData.filter(cat => cat.level === 1);
     const level2Categories = parentLevel1Id
-        ? categoriesData.filter(
-            (cat) => cat.level === 2 && cat.parentId === parentLevel1Id
-        )
-        : categoriesData.filter((cat) => cat.level === 2);
+        ? categoriesData.filter(cat => cat.level === 2 && cat.parentId === parentLevel1Id)
+        : categoriesData.filter(cat => cat.level === 2);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!name) {
-            alert("Vui lòng nhập tên danh mục");
+            alert('Vui lòng nhập tên danh mục');
             return;
         }
         if (level === 2 && !parentId) {
-            alert("Vui lòng chọn danh mục cấp 1 làm cha");
+            alert('Vui lòng chọn danh mục cấp 1 làm cha');
             return;
         }
         if (level === 3 && (!parentLevel1Id || !parentId)) {
-            alert("Vui lòng chọn đầy đủ danh mục cấp 1 và cấp 2 làm cha");
+            alert('Vui lòng chọn đầy đủ danh mục cấp 1 và cấp 2 làm cha');
             return;
         }
         const newCategory = { name, parentId, level };
@@ -71,7 +69,7 @@ const AddCategoryForm: React.FC = () => {
                     <select
                         id="level"
                         value={level}
-                        onChange={(e) => {
+                        onChange={e => {
                             setLevel(Number(e.target.value));
                             setParentLevel1Id(null);
                             setParentId(null);
@@ -85,18 +83,21 @@ const AddCategoryForm: React.FC = () => {
                 </div>
                 {level === 2 && (
                     <div>
-                        <label htmlFor="parentLevel1" className="block text-sm font-medium text-gray-700">
+                        <label
+                            htmlFor="parentLevel1"
+                            className="block text-sm font-medium text-gray-700"
+                        >
                             Chọn danh mục cấp 1 (cha)
                         </label>
                         <select
                             id="parentLevel1"
-                            value={parentId || ""}
-                            onChange={(e) => setParentId(e.target.value)}
+                            value={parentId || ''}
+                            onChange={e => setParentId(e.target.value)}
                             className="mt-1 block w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-black"
                         >
                             <option value="">Chọn danh mục cấp 1</option>
                             {level1Categories.length > 0 ? (
-                                level1Categories.map((cat) => (
+                                level1Categories.map(cat => (
                                     <option key={cat._id} value={cat._id}>
                                         {cat.name}
                                     </option>
@@ -113,13 +114,16 @@ const AddCategoryForm: React.FC = () => {
                 {level === 3 && (
                     <>
                         <div>
-                            <label htmlFor="parentLevel1" className="block text-sm font-medium text-gray-700">
+                            <label
+                                htmlFor="parentLevel1"
+                                className="block text-sm font-medium text-gray-700"
+                            >
                                 Chọn danh mục cấp 1
                             </label>
                             <select
                                 id="parentLevel1"
-                                value={parentLevel1Id || ""}
-                                onChange={(e) => {
+                                value={parentLevel1Id || ''}
+                                onChange={e => {
                                     setParentLevel1Id(e.target.value);
                                     setParentId(null);
                                 }}
@@ -127,7 +131,7 @@ const AddCategoryForm: React.FC = () => {
                             >
                                 <option value="">Chọn danh mục cấp 1</option>
                                 {level1Categories.length > 0 ? (
-                                    level1Categories.map((cat) => (
+                                    level1Categories.map(cat => (
                                         <option key={cat._id} value={cat._id}>
                                             {cat.name}
                                         </option>
@@ -142,18 +146,21 @@ const AddCategoryForm: React.FC = () => {
 
                         {parentLevel1Id && (
                             <div>
-                                <label htmlFor="parentLevel2" className="block text-sm font-medium text-gray-700">
+                                <label
+                                    htmlFor="parentLevel2"
+                                    className="block text-sm font-medium text-gray-700"
+                                >
                                     Chọn danh mục cấp 2 (cha)
                                 </label>
                                 <select
                                     id="parentLevel2"
-                                    value={parentId || ""}
-                                    onChange={(e) => setParentId(e.target.value)}
+                                    value={parentId || ''}
+                                    onChange={e => setParentId(e.target.value)}
                                     className="mt-1 block w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-black"
                                 >
                                     <option value="">Chọn danh mục cấp 2</option>
                                     {level2Categories.length > 0 ? (
-                                        level2Categories.map((cat) => (
+                                        level2Categories.map(cat => (
                                             <option key={cat._id} value={cat._id}>
                                                 {cat.name}
                                             </option>
@@ -177,7 +184,7 @@ const AddCategoryForm: React.FC = () => {
                         type="text"
                         id="name"
                         value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={e => setName(e.target.value)}
                         placeholder="Nhập tên danh mục"
                         className="mt-1 block w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-black"
                         required
@@ -190,7 +197,7 @@ const AddCategoryForm: React.FC = () => {
                         disabled={mutation.isPending}
                         className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-400"
                     >
-                        {mutation.isPending ? "Đang thêm..." : "Thêm danh mục"}
+                        {mutation.isPending ? 'Đang thêm...' : 'Thêm danh mục'}
                     </button>
                 </div>
             </form>

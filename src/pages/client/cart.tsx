@@ -1,70 +1,89 @@
-import React from "react";
-import HeaderClient from "../../layouts/clientHeader";
-import Footer from "../../layouts/clientFooter";
-import MenuClient from "../../layouts/clientMenu";
-import { Link } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getCart, deleteCart } from "../../services/userService";
-import { CartData, ICartItem } from "../../types/cart";
-import { useAuth } from "../../components/context/auth.context";
-import { toast } from "react-toastify";
+import React from 'react';
+import HeaderClient from '../../layouts/clientHeader';
+import Footer from '../../layouts/clientFooter';
+import MenuClient from '../../layouts/clientMenu';
+import { Link } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteCart } from '../../services/userService';
+import { ICartItem } from '../../types/cart';
+import { useAuth } from '../../context/auth.context';
+import { toast } from 'react-toastify';
+import { getList } from '../../api/provider';
+import Loading from '../../components/loading';
 
 const Cart = () => {
     const queryClient = useQueryClient();
     const { auth } = useAuth();
-    const { data: cartItems, isLoading, error } = useQuery<CartData>({
-        queryKey: ["cart"],
-        queryFn: getCart,
+    const {
+        data: cartItems,
+        isLoading,
+        error,
+    } = useQuery({
+        queryKey: ['cart'],
+        queryFn: async () => getList({ namespace: `cart` }),
+        staleTime: 60 * 1000,
     });
 
     const deleteCartMutation = useMutation({
-        mutationFn: ({ userId, productId, size }: { userId: string; productId: string; size: string }) => 
-            deleteCart(userId, productId, size),
+        mutationFn: ({
+            userId,
+            productVariantId,
+            size,
+        }: {
+            userId: string;
+            productVariantId: string;
+            size: string;
+        }) => deleteCart(userId, productVariantId, size),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
-            toast.success("Xóa sản phẩm khỏi giỏ hàng thành công");
+            queryClient.invalidateQueries({ queryKey: ['cart'] });
+            toast.success('Xóa sản phẩm khỏi giỏ hàng thành công');
         },
         onError: (error: Error) => {
-            console.error("Lỗi khi xóa sản phẩm:", error);
-            toast.error("Lỗi khi xóa sản phẩm");
+            console.error('Lỗi khi xóa sản phẩm:', error);
+            toast.error('Lỗi khi xóa sản phẩm');
         },
     });
 
-    const handleDeleteItem = (productId: string, size: string) => {
+    const handleDeleteItem = (productVariantId: string, size: string) => {
         if (!auth.user.id) {
-            toast.error("Bạn cần đăng nhập để thực hiện thao tác này");
+            toast.error('Bạn cần đăng nhập để thực hiện thao tác này');
             return;
         }
+        console.log(productVariantId, size);
+
         deleteCartMutation.mutate({
             userId: auth.user.id,
-            productId,
-            size
+            productVariantId: productVariantId,
+            size,
         });
     };
 
-    if (isLoading) return <div>Đang tải giỏ hàng...</div>;
+    if (isLoading) return <Loading />;
     if (error) return <div>Lỗi khi tải giỏ hàng: {(error as Error).message}</div>;
 
     // Kiểm tra và xử lý dữ liệu an toàn
     const items: ICartItem[] = cartItems?.items || [];
-    const validItems = items.filter(item => 
-        item && 
-        item.productId && 
-        typeof item.productId === 'object' && 
-        item.productId !== null
+    const validItems = items.filter(
+        item =>
+            item &&
+            item.productVariantId &&
+            typeof item.productVariantId === 'object' &&
+            item.productVariantId !== null
     );
 
-    console.log('Cart Items:', validItems);
-
-    // Tính toán tổng số lượng và giá trị an toàn
     const totalQuantity = validItems.reduce((sum, item) => {
         if (!item || typeof item.quantity !== 'number') return sum;
         return sum + item.quantity;
     }, 0);
 
     const totalPrice = validItems.reduce((sum, item) => {
-        if (!item?.productId?.price || typeof item.productId.price !== 'number' || !item.quantity) return sum;
-        return sum + (item.productId.price * item.quantity);
+        if (
+            !item?.productVariantId?.price ||
+            typeof item.productVariantId.price !== 'number' ||
+            !item.quantity
+        )
+            return sum;
+        return sum + item.productVariantId.price * item.quantity;
     }, 0);
 
     return (
@@ -76,69 +95,109 @@ const Cart = () => {
                     <article className="grid grid-cols-[4fr_1.5fr] gap-10 mt-[100px]">
                         <div>
                             <div className="border w-full h-[96.6px] flex justify-center rounded-tl-[20px] rounded-br-[20px]">
-                                <div className="w-[14px] h-[14px] rounded border-2 border-[#e7e8e9] rounded-full bg-black mt-6 z-10 relative">
-                                    <p className="text-[12px] mt-4 left-[-20px] w-16 absolute">Giỏ hàng</p>
+                                <div className="w-[14px] h-[14px] border-2 border-[#e7e8e9] rounded-full bg-black mt-6 z-10 relative">
+                                    <p className="text-[12px] mt-4 left-[-20px] w-16 absolute">
+                                        Giỏ hàng
+                                    </p>
                                 </div>
                                 <div className="h-[3px] w-[200px] bg-[#e7e8e9] mx-2 mt-[30px]"></div>
-                                <div className="w-[14px] h-[14px] rounded rounded-full bg-white border-2 border-[#e7e8e9] mt-6 z-10 relative">
-                                    <div className="text-[12px] mt-4 left-[-20px] w-16 absolute">Đặt hàng</div>
+                                <div className="w-[14px] h-[14px] rounded-full bg-white border-2 border-[#e7e8e9] mt-6 z-10 relative">
+                                    <div className="text-[12px] mt-4 left-[-20px] w-16 absolute">
+                                        Đặt hàng
+                                    </div>
                                 </div>
                                 <div className="h-[3px] w-[200px] bg-[#e7e8e9] mx-2 mt-[30px]"></div>
-                                <div className="w-[14px] h-[14px] rounded rounded-full bg-white border-2 border-[#e7e8e9] mt-6 z-10 relative">
-                                    <div className="text-[12px] mt-4 left-[-20px] w-20 absolute">Thanh toán</div>
+                                <div className="w-[14px] h-[14px] rounded-full bg-white border-2 border-[#e7e8e9] mt-6 z-10 relative">
+                                    <div className="text-[12px] mt-4 left-[-20px] w-20 absolute">
+                                        Thanh toán
+                                    </div>
                                 </div>
                                 <div className="h-[3px] w-[200px] bg-[#e7e8e9] mx-2 mt-[30px]"></div>
-                                <div className="w-[14px] h-[14px] rounded rounded-full bg-white border-2 border-[#e7e8e9] mt-6 z-10 relative">
-                                    <div className="text-[12px] mt-4 left-[-40px] w-28 absolute">Hoàn thành đơn</div>
+                                <div className="w-[14px] h-[14px] rounded-full bg-white border-2 border-[#e7e8e9] mt-6 z-10 relative">
+                                    <div className="text-[12px] mt-4 left-[-40px] w-28 absolute">
+                                        Hoàn thành đơn
+                                    </div>
                                 </div>
                             </div>
                             <div className="flex gap-2 mb-4 pt-6">
                                 <div className="text-[24px] font-semibold">Giỏ hàng của bạn</div>
-                                <div className="text-[24px] text-[#d73831] font-semibold">{totalQuantity} Sản Phẩm</div>
+                                <div className="text-[24px] text-[#d73831] font-semibold">
+                                    {totalQuantity} Sản Phẩm
+                                </div>
                             </div>
                             <div>
                                 <table className="w-full bg-white table-auto border-collapse">
                                     <thead className="border-b bg-gray-100">
                                         <tr>
-                                            <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Sản phẩm</th>
-                                            <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Số lượng</th>
-                                            <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Size</th>
-                                            <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Tổng tiền</th>
+                                            <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">
+                                                Sản phẩm
+                                            </th>
+                                            <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">
+                                                Số lượng
+                                            </th>
+                                            <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">
+                                                Size
+                                            </th>
+                                            <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">
+                                                Tổng tiền
+                                            </th>
                                             <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {validItems.length > 0 ? (
                                             validItems.map((item: ICartItem, index: number) => (
-                                                <tr key={item._id} className={`border-b hover:bg-gray-50 ${index % 2 === 1 ? 'bg-gray-100' : ''}`}>
+                                                <tr
+                                                    key={item._id}
+                                                    className={`border-b hover:bg-gray-50 ${index % 2 === 1 ? 'bg-gray-100' : ''}`}
+                                                >
                                                     <td className="px-4 py-2 text-sm text-gray-700">
                                                         <div className="flex items-center gap-4">
                                                             <Link
-                                                                to={`/products/${encodeURIComponent(item?.productId?._id || '')}`}
+                                                                to={`/products/${encodeURIComponent(item?.productVariantId?._id || '')}`}
                                                                 className="group relative block"
                                                             >
                                                                 <img
-                                                                    src={item?.productId?.images?.main || "/fallback.jpg"}
-                                                                    alt={item?.productId?.name || "Product"}
+                                                                    src={
+                                                                        item?.productVariantId
+                                                                            ?.images?.main ||
+                                                                        '/fallback.jpg'
+                                                                    }
+                                                                    alt={
+                                                                        item?.productVariantId
+                                                                            ?.productId?.name ||
+                                                                        'Product'
+                                                                    }
                                                                     className="w-28 h-[140px] object-cover rounded transition-opacity duration-300 ease-in-out opacity-100 group-hover:opacity-0"
-                                                                    onError={(e) =>
-                                                                        (e.currentTarget.src = "/fallback.jpg")
+                                                                    onError={e =>
+                                                                        (e.currentTarget.src =
+                                                                            '/fallback.jpg')
                                                                     }
                                                                 />
                                                                 <img
-                                                                    src={item?.productId?.images?.hover || "/fallback.jpg"}
-                                                                    alt={item?.productId?.name || "Product"}
+                                                                    src={
+                                                                        item?.productVariantId
+                                                                            ?.images?.hover ||
+                                                                        '/fallback.jpg'
+                                                                    }
+                                                                    alt={
+                                                                        item?.productVariantId
+                                                                            ?.productId?.name ||
+                                                                        'Product'
+                                                                    }
                                                                     className="w-28 h-[140px] object-cover rounded absolute top-0 left-0 transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100"
-                                                                    onError={(e) =>
-                                                                        (e.currentTarget.src = "/fallback.jpg")
+                                                                    onError={e =>
+                                                                        (e.currentTarget.src =
+                                                                            '/fallback.jpg')
                                                                     }
                                                                 />
                                                             </Link>
                                                             <Link
-                                                                to={`/products/${encodeURIComponent(item?.productId?._id || '')}`}
+                                                                to={`/products/${encodeURIComponent(item?.productVariantId?._id || '')}`}
                                                                 className="hover:text-orange-600 transition-all duration-300"
                                                             >
-                                                                {item?.productId?.name || "Unnamed Product"}
+                                                                {item?.productVariantId?.productId
+                                                                    ?.name || 'Unnamed Product'}
                                                             </Link>
                                                         </div>
                                                     </td>
@@ -168,14 +227,25 @@ const Cart = () => {
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="px-4 py-2 text-sm text-gray-700">{item.size}</td>
                                                     <td className="px-4 py-2 text-sm text-gray-700">
-                                                        {((item?.productId?.price || 0) * (item?.quantity || 0)).toLocaleString("vi-VN")} đ
+                                                        {item.size}
+                                                    </td>
+                                                    <td className="px-4 py-2 text-sm text-gray-700">
+                                                        {(
+                                                            (item?.productVariantId?.price || 0) *
+                                                            (item?.quantity || 0)
+                                                        ).toLocaleString('vi-VN')}{' '}
+                                                        đ
                                                     </td>
                                                     <td
                                                         className="px-4 py-2 text-sm text-red-500 cursor-pointer"
                                                         id={`removeBtn-${item._id}`}
-                                                        onClick={() => handleDeleteItem(item?.productId?._id || '', item.size)}
+                                                        onClick={() =>
+                                                            handleDeleteItem(
+                                                                item?.productVariantId?._id || '',
+                                                                item.size
+                                                            )
+                                                        }
                                                     >
                                                         <svg
                                                             xmlns="http://www.w3.org/2000/svg"
@@ -189,7 +259,10 @@ const Cart = () => {
                                             ))
                                         ) : (
                                             <tr>
-                                                <td colSpan={5} className="px-4 py-2 text-center text-gray-500">
+                                                <td
+                                                    colSpan={5}
+                                                    className="px-4 py-2 text-center text-gray-500"
+                                                >
                                                     Giỏ hàng của bạn trống.
                                                 </td>
                                             </tr>
@@ -199,7 +272,7 @@ const Cart = () => {
                             </div>
                             <div className="mt-6">
                                 <button className="bg-white border border-black w-[250px] transition-all pt-[14px] pr-[24px] pb-[14px] pl-[24px] rounded-tl-[20px] rounded-br-[20px] hover:bg-black hover:text-white flex">
-                                    <Link to={"/"} className="mx-auto font-semibold">
+                                    <Link to={'/'} className="mx-auto font-semibold">
                                         ← Tiếp tục mua hàng
                                     </Link>
                                 </button>
@@ -219,27 +292,37 @@ const Cart = () => {
                                 <div className="text-[14px] text-[#57585A]">
                                     <div className="flex justify-between">
                                         <div>Tổng tiền hàng</div>
-                                        <div>{totalPrice.toLocaleString("vi-VN")} đ</div>
+                                        <div>{totalPrice.toLocaleString('vi-VN')} đ</div>
                                     </div>
                                 </div>
                                 <br />
                                 <div className="text-[14px] text-[#57585A]">
                                     <div className="flex justify-between">
                                         <div>Tạm tính</div>
-                                        <div className="font-semibold">{totalPrice.toLocaleString("vi-VN")} đ</div>
+                                        <div className="font-semibold">
+                                            {totalPrice.toLocaleString('vi-VN')} đ
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="text-[14px] text-[#AC2F33] my-6">
-                                    Sản phẩm nằm trong chương trình đồng giá, giảm giá trên 50% không hỗ trợ đổi trả
+                                    Sản phẩm nằm trong chương trình đồng giá, giảm giá trên 50%
+                                    không hỗ trợ đổi trả
                                 </div>
                                 <hr />
                             </div>
                             <div>
-                                <p className={`bg-black w-68 h-[50px] rounded-tl-2xl rounded-br-2xl flex items-center justify-center lg:text-[16px] md:text-[12px] text-white font-semibold ${validItems.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white hover:text-black hover:border hover:border-black cursor-pointer'} transition-all duration-300`}>
-                                    {validItems.length === 0 ? 'GIỎ HÀNG TRỐNG' : 'ĐẶT HÀNG'}
-                                </p>
+                                {validItems.length === 0 ? (
+                                    <p className="bg-black w-68 h-[50px] rounded-tl-2xl rounded-br-2xl flex items-center justify-center lg:text-[16px] md:text-[12px] text-white font-semibold opacity-50 cursor-not-allowed transition-all duration-300">
+                                        GIỎ HÀNG TRỐNG
+                                    </p>
+                                ) : (
+                                    <Link to="/dathang">
+                                        <p className="bg-black w-68 h-[50px] rounded-tl-2xl rounded-br-2xl flex items-center justify-center lg:text-[16px] md:text-[12px] text-white font-semibold hover:bg-white hover:text-black hover:border hover:border-black cursor-pointer transition-all duration-300">
+                                            ĐẶT HÀNG
+                                        </p>
+                                    </Link>
+                                )}
                             </div>
-                           
                         </div>
                     </article>
                 </article>

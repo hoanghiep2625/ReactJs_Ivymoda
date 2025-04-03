@@ -8,7 +8,6 @@ export interface AuthState {
     user: UserType;
 }
 export interface AuthContextType {
-    
     isAuthenticated: boolean;
     user: UserType;
     setAuth: (auth: AuthState) => void;

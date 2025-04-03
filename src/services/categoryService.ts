@@ -1,5 +1,5 @@
-import axiosInstance from "./axiosInstance";
-import { Category } from "../types/categories";
+import axiosInstance from './axiosInstance';
+import { Category } from '../types/categories';
 
 const API_URL = import.meta.env.VITE_API_URL;
 interface CategoryResponse {
@@ -9,7 +9,11 @@ export const getCategories = async (): Promise<CategoryResponse> => {
     const response = await axiosInstance.get(`${API_URL}/categories`);
     return response.data;
 };
-export const addCategory = async (newCategory: { name: string; parentId: string | null; level: number }) => {
+export const addCategory = async (newCategory: {
+    name: string;
+    parentId: string | null;
+    level: number;
+}) => {
     const response = await axiosInstance.post<Category>(`${API_URL}/admin/categories`, newCategory);
     return response.data;
 };

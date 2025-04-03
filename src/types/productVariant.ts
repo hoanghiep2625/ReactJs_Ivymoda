@@ -1,15 +1,11 @@
-export interface IProduct {
+export interface IProductVariant {
     _id: string;
-    name: string;
+    productId: string; // Liên kết tới IProduct._id
     sku: string;
     price: number;
-    categoryId: string;
-    categoryAncestors: string[];
-    colors: IColor[];
+    color: IColor;
     images: IImages;
     sizes: ISize[];
-    shortDescription: string;
-    description: string;
     createdAt: string;
     updatedAt: string;
 }
@@ -18,7 +14,6 @@ export interface IColor {
     baseColor: string;
     actualColor: string;
     colorName: string;
-    _id?: string;
 }
 
 export interface IImages {
@@ -28,7 +23,6 @@ export interface IImages {
 }
 
 export interface ISize {
-    size: string;
+    size: 'S' | 'M' | 'L' | 'XL' | 'XXL';
     stock: number;
-    _id?: string;
 }

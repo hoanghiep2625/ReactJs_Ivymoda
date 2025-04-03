@@ -1,11 +1,11 @@
-import { Helmet } from "react-helmet-async";
-import { useEffect } from "react";
+import { Helmet } from 'react-helmet-async';
+import { useEffect } from 'react';
 
 const HeaderClient = () => {
     useEffect(() => {
         // Load Swiper.js
-        const script = document.createElement("script");
-        script.src = "https://unpkg.com/swiper/swiper-bundle.min.js";
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/swiper/swiper-bundle.min.js';
         script.async = true;
         document.body.appendChild(script);
 
