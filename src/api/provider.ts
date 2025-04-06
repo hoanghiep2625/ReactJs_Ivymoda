@@ -11,6 +11,7 @@ export type ProviderProps = {
 export const getList = async ({ namespace }: ProviderProps) => {
     try {
         const { data } = await axiosInstance.get(`/${namespace}`);
+        console.log("apiii:", axiosInstance.defaults.baseURL);
         return data || [];
     } catch (error) {
         console.error('Lỗi khi lấy danh sách:', error);

@@ -12,9 +12,10 @@ import { info, logout } from "../services/userService";
 import { AxiosError } from "axios";
 import Loading from "../components/loading";
 
+// Định nghĩa state xác thực
 interface AuthState {
   isAuthenticated: boolean;
-  isAuthenticating: boolean; // Thêm trạng thái xác thực
+  isAuthenticating: boolean;
   user: {
     id: string;
     email: string;
@@ -22,15 +23,16 @@ interface AuthState {
   };
 }
 
+// Interface cho context
 interface AuthContextType {
   auth: AuthState;
   setAuth: Dispatch<SetStateAction<AuthState>>;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(
-  undefined
-);
+// Tạo context
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Custom hook để dùng context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
@@ -39,14 +41,16 @@ export const useAuth = () => {
   return context;
 };
 
+// Props cho AuthWrapper
 interface AuthWrapperProps {
   children: ReactNode;
 }
 
+// Component bao bọc xác thực
 export const AuthWrapper = ({ children }: AuthWrapperProps) => {
   const [auth, setAuth] = useState<AuthState>({
     isAuthenticated: false,
-    isAuthenticating: true, // Khởi tạo là true
+    isAuthenticating: true,
     user: {
       id: "",
       email: "",
@@ -54,12 +58,15 @@ export const AuthWrapper = ({ children }: AuthWrapperProps) => {
     },
   });
 
+  // Gọi API user info nếu có token
   const { data, isLoading, error } = useQuery({
     queryKey: ["userInfo"],
     queryFn: info,
     enabled: !!localStorage.getItem("token"),
+    staleTime: 1000 * 60 * 5, // optional: cache 5 phút
   });
 
+  // Xử lý logout
   const handleLogout = async () => {
     try {
       await logout();
@@ -79,7 +86,10 @@ export const AuthWrapper = ({ children }: AuthWrapperProps) => {
     }
   };
 
+  // Khi có thay đổi từ react-query, cập nhật lại auth
   useEffect(() => {
+    console.log("📦 useEffect: ", { data, error, isLoading });
+
     if (isLoading) {
       setAuth((prev) => ({ ...prev, isAuthenticating: true }));
     } else if (data) {
@@ -107,13 +117,18 @@ export const AuthWrapper = ({ children }: AuthWrapperProps) => {
           },
         });
       }
+    } else {
+      // Nếu không có data, không có error, nhưng isLoading = false → fallback
+      setAuth((prev) => ({ ...prev, isAuthenticating: false }));
     }
   }, [data, error, isLoading]);
 
+  // Hiển thị loading khi đang xác thực
   if (auth.isAuthenticating) {
     return <Loading />;
   }
 
+  // Trả về context cho toàn bộ app
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
       {children}
