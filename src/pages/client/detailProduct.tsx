@@ -38,8 +38,7 @@ const DetailProduct = ({ productId }: { productId: string }) => {
     error,
   } = useQuery({
     queryKey: ["product-variants", productId],
-    queryFn: () =>
-      getById({ namespace: "product-variants/variants", id: productId }),
+    queryFn: () => getById({ namespace: "product-variants/", id: productId }),
   });
 
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -127,7 +126,7 @@ const DetailProduct = ({ productId }: { productId: string }) => {
               >
                 <img
                   id="mainImage"
-                  src={product.images.main}
+                  src={product.images.main.url}
                   className="w-full h-full object-cover transition-transform duration-300 ease-in-out"
                   alt={product.productId.name}
                 />
@@ -138,9 +137,9 @@ const DetailProduct = ({ productId }: { productId: string }) => {
                   className="flex flex-col gap-4 transition-transform duration-500"
                 >
                   {[
-                    product.images.main,
-                    product.images.hover,
-                    ...product.images.product,
+                    product.images.main?.url,
+                    product.images.hover?.url,
+                    ...product.images.product.map((img: any) => img.url),
                   ].map((img, index) => (
                     <img
                       key={index}
