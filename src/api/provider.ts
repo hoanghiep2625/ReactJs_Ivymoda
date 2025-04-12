@@ -45,3 +45,12 @@ export const postItem = async ({ namespace, values }: ProviderProps) => {
     throw error;
   }
 };
+export const getCartQuantity = async () => {
+  try {
+    const { data } = await axiosInstance.get("/cart/quantity");
+    return data.totalQuantity || 0;
+  } catch (error) {
+    console.error("Lỗi khi lấy số lượng giỏ hàng:", error);
+    return 0;
+  }
+};

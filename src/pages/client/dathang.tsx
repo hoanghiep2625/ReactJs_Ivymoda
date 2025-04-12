@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from "react";
-import HeaderClient from "../../layouts/clientHeader";
-import Footer from "../../layouts/clientFooter";
-import MenuClient from "../../layouts/clientMenu";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CartData, ICartItem } from "../../types/cart";
+import { ICartItem } from "../../types/cart";
 import { useAuth } from "../../context/auth.context";
 import { toast } from "react-toastify";
-import axios from "axios";
 import { getById, getList } from "../../api/provider";
 import Loading from "../../components/loading";
 import axiosInstance from "../../services/axiosInstance";
 import moment from "moment";
 import { useGHNMapper } from "../../utils/ghnMapping";
+import ClientLayout from "../../layouts/ClientLayout";
 
 const Dathang = () => {
   const queryClient = useQueryClient();
@@ -337,9 +334,7 @@ const Dathang = () => {
 
   return (
     <>
-      <HeaderClient />
-      <div className="mx-[5%]">
-        <MenuClient />
+      <ClientLayout>
         <article className="mt-[100px]">
           <article className="grid grid-cols-[4fr_1.5fr] gap-10 mt-[100px]">
             <div>
@@ -365,7 +360,7 @@ const Dathang = () => {
                 <div className="h-[3px] w-[200px] bg-[#e7e8e9] mx-2 mt-[30px]"></div>
                 <div className="w-[14px] h-[14px] rounded-full bg-white border-2 border-[#e7e8e9] mt-6 z-10 relative">
                   <div className="text-[12px] mt-4 left-[-40px] w-28 absolute">
-                    Hoàn thành đơn
+                    Hoàn thành
                   </div>
                 </div>
               </div>
@@ -523,8 +518,8 @@ const Dathang = () => {
                                   />
                                   <img
                                     src={
-                                      item?.productVariantId?.images?.hover ||
-                                      "/fallback.jpg"
+                                      item?.productVariantId?.images?.hover
+                                        ?.url || "/fallback.jpg"
                                     }
                                     alt={
                                       item?.productVariantId?.productId?.name ||
@@ -638,8 +633,7 @@ const Dathang = () => {
             </div>
           </article>
         </article>
-        <Footer />
-      </div>
+      </ClientLayout>
     </>
   );
 };

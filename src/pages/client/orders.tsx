@@ -1,14 +1,10 @@
-import React from "react";
-import MenuClient from "../../layouts/clientMenu";
-import HeaderClient from "../../layouts/clientHeader";
 import { Link } from "react-router-dom";
-import Footer from "../../layouts/clientFooter";
-import { ICartItem } from "../../types/cart";
 import { useQuery } from "@tanstack/react-query";
 import { getList } from "../../api/provider";
 import { useAuth } from "../../context/auth.context";
 import Loading from "../../components/loading";
 import MenuInfo from "../../components/menuInfo";
+import ClientLayout from "../../layouts/ClientLayout";
 
 const Orders = () => {
   const { data, isLoading, error } = useQuery({
@@ -25,52 +21,50 @@ const Orders = () => {
   }
 
   return (
-    <>
-      <HeaderClient />
-      <div className="mx-[5%]">
-        <MenuClient />
-        <article className="mt-[98px]">
-          <div className="flex gap-4 my-4">
-            <div className="text-sm">
-              <a href="?action=home">Trang chủ</a>
-            </div>
-            <div className="text-sm">-</div>
-            <div className="text-sm">Tài khoản của tôi</div>
+    <ClientLayout>
+      <article className="mt-[98px]">
+        <div className="flex gap-4 my-4">
+          <div className="text-sm">
+            <a href="?action=home">Trang chủ</a>
           </div>
-        </article>
-        <hr className="" />
-        <div className="flex pt-8 py-1 gap-12">
-          {/* Sidebar Menu */}
-          <MenuInfo />
+          <div className="text-sm">-</div>
+          <div className="text-sm">Tài khoản của tôi</div>
+        </div>
+      </article>
+      <hr className="" />
+      <div className="flex pt-8 py-1 gap-12">
+        {/* Sidebar Menu */}
+        <MenuInfo />
 
-          {/* Main Content: Orders Table */}
-          <div className="flex-1 bg-white rounded-lg shadow-sm">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">
-              QUẢN LÝ ĐƠN HÀNG
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full border-collapse bg-white">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="py-3 pr-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                      Mã đơn hàng
-                    </th>
-                    <th className="py-3 pr-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                      Ngày đặt
-                    </th>
-                    <th className="py-3 pr-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                      Trạng thái
-                    </th>
-                    <th className="py-3 pr-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                      Tổng tiền
-                    </th>
-                    <th className="py-3 pr-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                      Thao tác
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {data.orders.map((order: any, index: any) => (
+        {/* Main Content: Orders Table */}
+        <div className="flex-1 bg-white rounded-lg shadow-sm">
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">
+            QUẢN LÝ ĐƠN HÀNG
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full border-collapse bg-white">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="py-3 pr-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                    Mã đơn hàng
+                  </th>
+                  <th className="py-3 pr-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                    Ngày đặt
+                  </th>
+                  <th className="py-3 pr-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                    Trạng thái
+                  </th>
+                  <th className="py-3 pr-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                    Tổng tiền
+                  </th>
+                  <th className="py-3 pr-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                    Thao tác
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {data?.orders?.length > 0 ? (
+                  data.orders.map((order: any, index: any) => (
                     <tr
                       key={index}
                       className="hover:bg-gray-50 transition-colors duration-200"
@@ -131,15 +125,23 @@ const Orders = () => {
                         </div>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="py-4 text-center text-sm text-gray-600"
+                    >
+                      Chưa có đơn hàng nào.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
-        <Footer />
       </div>
-    </>
+    </ClientLayout>
   );
 };
 

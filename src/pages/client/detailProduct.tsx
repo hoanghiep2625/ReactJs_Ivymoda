@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../context/auth.context";
-import HeaderClient from "../../layouts/clientHeader";
-import MenuClient from "../../layouts/clientMenu";
-import Footer from "../../layouts/clientFooter";
 import { toast } from "react-toastify";
-import { AddToCartItem } from "../../types/cart";
 import { getById } from "../../api/provider";
 import { addToCart } from "../../services/userService";
 import { Rate } from "antd";
@@ -13,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import Loading from "../../components/loading";
 import { IProductVariant } from "../../types/productVariant";
 import { CartItem } from "../../types/cart";
+import ClientLayout from "../../layouts/ClientLayout";
 
 // Custom interface to match the actual data structure
 interface ProductVariantWithDetails extends Omit<IProductVariant, "productId"> {
@@ -71,6 +68,7 @@ const DetailProduct = ({ productId }: { productId: string }) => {
     mutationFn: addToCart,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
+      queryClient.invalidateQueries({ queryKey: ["cartQuantity"] });
       toast.success("Thêm vào giỏ hàng thành công");
     },
     onError: (error: Error) => {
@@ -103,9 +101,7 @@ const DetailProduct = ({ productId }: { productId: string }) => {
 
   return (
     <>
-      <HeaderClient />
-      <div className="mx-[5%]">
-        <MenuClient />
+      <ClientLayout>
         <article className="mt-[98px]">
           <div className="flex gap-4 my-4">
             <div className="text-sm">
@@ -384,8 +380,7 @@ const DetailProduct = ({ productId }: { productId: string }) => {
             />
           </div>
         </article>
-        <Footer />
-      </div>
+      </ClientLayout>
     </>
   );
 };
