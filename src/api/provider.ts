@@ -11,7 +11,6 @@ export type ProviderProps = {
 export const getList = async ({ namespace }: ProviderProps) => {
   try {
     const { data } = await axiosInstance.get(`/${namespace}`);
-    console.log("✅ API Response:", JSON.stringify(data, null, 2)); // <-- log rõ ràng
     return data || [];
   } catch (error) {
     console.error("❌ Lỗi khi lấy danh sách:", error);

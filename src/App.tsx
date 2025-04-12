@@ -9,6 +9,8 @@ import Cart from './pages/client/cart';
 import Dathang from './pages/client/dathang';
 import CheckLogin from './components/CheckLogin'; //Nếu chưa đăng nhập thì chuyển về trang login
 import Orders from './pages/client/orders';
+import Address from './pages/client/address';
+import Detail_order from './pages/client/detailOrder';
 
 function App() {
     const DetailProductWrapper = () => {
@@ -24,8 +26,10 @@ function App() {
         { path: '/register', element: <Register /> },
         { path: '/products/:id', element: <DetailProductWrapper /> },
         { path: '/orders', element: <CheckLogin element={<Orders />} /> },
+        { path: '/order-details/:id', element: <CheckLogin element={<Detail_order />} /> },
         { path: '/cart', element: <CheckLogin element={<Cart />} /> },
         { path: '/dathang', element: <CheckLogin element={<Dathang />} /> },
+        { path: '/address', element: <CheckLogin element={<Address />} /> },
     ]);
     return routes;
 }

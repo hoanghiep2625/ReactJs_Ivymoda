@@ -163,6 +163,13 @@ const Register = () => {
     }));
   };
 
+
+
+  const cityObj = cities.find((city) => city.Id === selectedCity);
+  const districtObj = districts.find((d) => d.Id === selectedDistrict);
+  const communeObj = wards.find((c) => c.Id === selectedWard);
+
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrors(null);
@@ -182,9 +189,18 @@ const Register = () => {
           {
             receiver_name: validatedData.name,
             phone: validatedData.phone,
-            city: validatedData.city,
-            district: validatedData.district,
-            commune: validatedData.commune,
+            city: {
+              id: cityObj?.Id || "",
+              name: cityObj?.Name || "",
+            },
+            district: {
+              id: districtObj?.Id || "",
+              name: districtObj?.Name || "",
+            },
+            commune: {
+              id: communeObj?.Id || "",
+              name: communeObj?.Name || "",
+            },
             address: validatedData.address,
             isDefault: true,
           },
@@ -197,6 +213,8 @@ const Register = () => {
       }
     }
   };
+  console.log(formData);
+  
   return (
     <>
       <HeaderClient />

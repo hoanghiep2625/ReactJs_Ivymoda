@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import HeaderClient from "../../layouts/clientHeader";
 import Footer from "../../layouts/clientFooter";
 import MenuClient from "../../layouts/clientMenu";
@@ -12,12 +12,76 @@ import { getById, getList } from "../../api/provider";
 import Loading from "../../components/loading";
 import axiosInstance from "../../services/axiosInstance";
 import moment from "moment";
+import { useGHNMapper } from "../../utils/ghnMapping";
 
 const Dathang = () => {
   const queryClient = useQueryClient();
   const { auth } = useAuth();
   const [showProducts, setShowProducts] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState("cod");
+
+  // const cityName = userData[0].city.name;
+  // const districtName = userData[0].district.name;
+  // const wardName = userData[0].commune.name;
+  const cityName = "Hà Nội";
+  const districtName = "Quận Nam Từ Liêm";
+  const wardName = "Phường Xuân Phương";
+
+  const {
+    provinces,
+    districts,
+    wards,
+    fetchDistricts,
+    fetchWards,
+    findProvinceId,
+    findDistrictId,
+    findWardCode,
+  } = useGHNMapper("5191a6d2-16d1-11f0-8b10-8e771ee3638b");
+
+  // 1. Khi provinces đã load, tìm provinceId và fetch district
+  useEffect(() => {
+    if (provinces.length === 0) return;
+
+    const provinceId = findProvinceId(cityName);
+    if (provinceId) {
+      console.log("✅ Province ID:", provinceId);
+      fetchDistricts(provinceId);
+    } else {
+      console.warn("❌ Không tìm thấy province");
+    }
+  }, [provinces]);
+
+  // 2. Khi districts đã load, tìm districtId và fetch ward
+  useEffect(() => {
+    if (districts.length === 0 || provinces.length === 0) return;
+
+    const provinceId = findProvinceId(cityName);
+    if (!provinceId) return;
+
+    const districtId = findDistrictId(districtName, provinceId);
+    if (districtId) {
+      console.log("✅ District ID:", districtId);
+      fetchWards(districtId);
+    } else {
+      console.warn("❌ Không tìm thấy district");
+    }
+  }, [districts]);
+
+  // 3. Khi wards đã load, tìm wardCode
+  useEffect(() => {
+    if (wards.length === 0 || districts.length === 0) return;
+
+    const provinceId = findProvinceId(cityName);
+    const districtId = findDistrictId(districtName, provinceId!);
+    if (!districtId) return;
+
+    const wardCode = findWardCode(wardName, districtId);
+    if (wardCode) {
+      console.log("✅ Ward Code:", wardCode);
+    } else {
+      console.warn("❌ Không tìm thấy ward");
+    }
+  }, [wards]);
 
   const {
     data: cartItems,
@@ -28,7 +92,6 @@ const Dathang = () => {
     queryFn: async () => getList({ namespace: `cart` }),
     staleTime: 60 * 1000,
   });
-  const navigate = useNavigate();
   const {
     data: userData,
     isLoading: userLoading,
@@ -55,11 +118,11 @@ const Dathang = () => {
   const address =
     userData[0].address +
     ", " +
-    userData[0].district +
+    userData[0].district.name +
     ", " +
-    userData[0].commune +
+    userData[0].commune.name +
     ", " +
-    userData[0].city;
+    userData[0].city.name;
 
   const items: ICartItem[] = cartItems?.items || [];
   const validItems = items.filter(
@@ -446,8 +509,8 @@ const Dathang = () => {
                                 >
                                   <img
                                     src={
-                                      item?.productVariantId?.images?.main ||
-                                      "/fallback.jpg"
+                                      item?.productVariantId?.images?.main
+                                        ?.url || "/fallback.jpg"
                                     }
                                     alt={
                                       item?.productVariantId?.productId?.name ||

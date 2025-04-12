@@ -6,10 +6,10 @@ const MenuInfo = () => {
   const { auth } = useAuth();
 
   return (
-    <div className="p-8 w-[300px] font-bold border rounded-tl-[40px] rounded-br-[40px] border-gray-700">
+    <div className="p-8 w-[300px] font-bold border rounded-tl-[40px] rounded-br-[40px] border-gray-700 h-[370px]">
       <nav>
         <div className="font-semibold text-gray-500 flex items-center gap-2 p-4">
-          <img src="/images/useravt.png" className="w-8 h-8" alt="" />
+          <img src="/images/useravt.png" className="w-8 h-8 rounded-full" alt="" />
           {auth.user.email}
         </div>
         <hr />

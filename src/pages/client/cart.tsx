@@ -160,7 +160,7 @@ const Cart = () => {
                                                                 <img
                                                                     src={
                                                                         item?.productVariantId
-                                                                            ?.images?.main ||
+                                                                            ?.images?.main?.url ||
                                                                         '/fallback.jpg'
                                                                     }
                                                                     alt={
