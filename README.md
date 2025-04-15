@@ -1,30 +1,45 @@
-# React + TypeScript + Vite
+# 🛍️ IvyModa – React Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the **ReactJS** frontend for the [IvyModa Clothing Store](https://react-js-ivymoda.vercel.app).  
+The frontend is built using **React**, **TypeScript**. It interacts with the **Node.js API** backend using **JWT** authentication and **RESTful API** endpoints.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🔗 Live Projects
 
-## Expanding the ESLint configuration
+👉 Frontend Website: [https://react-js-ivymoda.vercel.app](https://react-js-ivymoda.vercel.app)  
+👉 Backend API: [https://nodejs-ivymoda.fly.dev](https://nodejs-ivymoda.fly.dev)
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+---
 
-- Configure the top-level `parserOptions` property like this:
+## 📦 GitHub Repositories
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+- 👉 Frontend Repo: [github.com/hoanghiep2625/ReactJs_Ivymoda](https://github.com/hoanghiep2625/ReactJs_Ivymoda)
+- 👉 Backend Repo: [github.com/hoanghiep2625/NodeJs_Ivymoda](https://github.com/hoanghiep2625/NodeJs_Ivymoda)
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+---
+
+## 🚀 Features
+
+- ✅ **React** frontend with **TypeScript** for type safety
+- ✅ User authentication using **JWT** for secure login and protected routes
+- ✅ Dynamic data fetching via **RESTful API** (integrates seamlessly with Node.js backend)
+- ✅ Real-time updates and responsive design for eCommerce features
+- ✅ Form validation using **Zod** for robust input handling
+- ✅ Image uploading and displaying using **Cloudinary**
+- ✅ **Responsive Design**: Looks great on all screen sizes thanks to Tailwind CSS and AntD grid system
+- ✅ **Payment Integration** – Supports both **Momo** and **ZaloPay** for fast online checkout
+- ✅ **Axios**: For making HTTP requests to the backend API
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend**: React.js, TypeScript, Refine
+- **Authentication**: JWT (JSON Web Tokens)
+- **Form Validation**: Zod
+- **State Management**: React Context
+- **Styling**: Tailwind CSS, Ant Design (AntD)
+- **Image Upload**: Cloudinary
+- **API**: REST API interactions with the backend
+- **Payment**: Momo, ZaloPay
