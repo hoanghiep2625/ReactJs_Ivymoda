@@ -1,7 +1,7 @@
 import MenuInfo from "../../components/menuInfo";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getList, postItem } from "../../api/provider";
-import ClientLayout from "../../layouts/clientLayout";
+import ClientLayout from "../../layouts/ClientLayout";
 import React, { useEffect, useState } from "react";
 import { City, District, Ward } from "../../types/city";
 import { z } from "zod";
@@ -9,20 +9,19 @@ import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-const AddressSchema = z
-  .object({
-    receiver_name: z.string().min(2, "Tên người nhận tối thiểu 2 ký tự"),
-    phone: z
-      .string()
-      .regex(
-        /^(0|\+84)(3[2-9]|5[2689]|7[06-9]|8[1-689]|9[0-46-9])\d{7}$/,
-        "Sai định dạng số điện thoại Việt Nam"
-      ),
-    city: z.string().min(1, "Cần chọn thành phố"),
-    district: z.string().min(1, "Cần chọn quận/huyện"),
-    commune: z.string().min(1, "Cần chọn phường/xã"),
-    address: z.string().min(2, "Địa chỉ tối thiểu 2 ký tự"),
-  });
+const AddressSchema = z.object({
+  receiver_name: z.string().min(2, "Tên người nhận tối thiểu 2 ký tự"),
+  phone: z
+    .string()
+    .regex(
+      /^(0|\+84)(3[2-9]|5[2689]|7[06-9]|8[1-689]|9[0-46-9])\d{7}$/,
+      "Sai định dạng số điện thoại Việt Nam"
+    ),
+  city: z.string().min(1, "Cần chọn thành phố"),
+  district: z.string().min(1, "Cần chọn quận/huyện"),
+  commune: z.string().min(1, "Cần chọn phường/xã"),
+  address: z.string().min(2, "Địa chỉ tối thiểu 2 ký tự"),
+});
 
 type AddressFormDta = z.infer<typeof AddressSchema>;
 interface ErrorResponse {
@@ -74,13 +73,13 @@ const Address = () => {
 
   const mutation = useMutation({
     mutationFn: (payload: any) =>
-    postItem({ namespace: "auth/add-shipping-address", values: payload }),
+      postItem({ namespace: "auth/add-shipping-address", values: payload }),
     onSuccess: () => {
-            toast.success('Thêm địa chỉ thành công!');
-            setTimeout(() => {
-              window.location.reload(); // Reload lại trang
-            }, 1000);
-          },
+      toast.success("Thêm địa chỉ thành công!");
+      setTimeout(() => {
+        window.location.reload(); // Reload lại trang
+      }, 1000);
+    },
     onError: (error: AxiosError<ErrorResponse>) => {
       const errorData = error.response?.data;
       if (errorData?.errors) {
@@ -152,26 +151,24 @@ const Address = () => {
       const validatedData = AddressSchema.parse(formData);
 
       // Tạo payload
-      const payload = 
-        {
-          receiver_name: validatedData.receiver_name,
-          phone: validatedData.phone,
-          city: {
-            id: selectedCity,
-            name: cityObj?.Name || "",
-          },
-          district: {
-            id: selectedDistrict,
-            name: districtObj?.Name || "",
-          },
-          commune: {
-            id: selectedWard,
-            name: communeObj?.Name || "",
-          },
-          address: validatedData.address,
-          isDefault: true,
-        }
-      
+      const payload = {
+        receiver_name: validatedData.receiver_name,
+        phone: validatedData.phone,
+        city: {
+          id: selectedCity,
+          name: cityObj?.Name || "",
+        },
+        district: {
+          id: selectedDistrict,
+          name: districtObj?.Name || "",
+        },
+        commune: {
+          id: selectedWard,
+          name: communeObj?.Name || "",
+        },
+        address: validatedData.address,
+        isDefault: true,
+      };
 
       // Gửi payload qua mutation
       mutation.mutate(payload);

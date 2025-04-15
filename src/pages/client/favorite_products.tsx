@@ -1,4 +1,4 @@
-import ClientLayout from "../../layouts/clientLayout";
+import ClientLayout from "../../layouts/ClientLayout";
 
 const FavoriteProducts = () => {
   return (
