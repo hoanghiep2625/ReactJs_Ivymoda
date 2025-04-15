@@ -1,10 +1,10 @@
-import ClientLayout from "../../layouts/ClientLayout";
+import ClientLayout from "../../layouts/clientLayout";
 
 const FavoriteProducts = () => {
   return (
     <>
       <ClientLayout>
-        <article className="mb-8 ">
+        <article className="mb-8 mt-8 ">
           <hr />
           <nav>
             <div className="flex gap-4 mt-[20px]">
@@ -90,23 +90,7 @@ const FavoriteProducts = () => {
             </div>
             <div className=" mt-8">
               <div className="flex justify-between">
-                <h2 className="text-2xl font-bold mb-4">QUẢN LÝ ĐƠN HÀNG</h2>
-                <button className="rounded-tl-xl rounded-br-xl border-2 p-2 flex bg-black hover:bg-white text-white hover:text-black text-[18px] mr-20 hover:border-2 hover:border-black ">
-                  <svg
-                    className="w-5 h-5 border-2 border-white  rounded-full p-1 mt-1"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 448 512"
-                  >
-                    <path
-                      fill="#ffffff"
-                      className=""
-                      d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32
-                                         14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3
-                                          32-32s-14.3-32-32-32l-144 0 0-144z"
-                    />
-                  </svg>
-                  <div className="">Thêm địa chỉ</div>
-                </button>
+                <h2 className="text-2xl font-bold mb-4">Sản phẩm yêu thích</h2>
               </div>
               <div className="border-2 w-[470px] h-auto rounded-tl-2xl rounded-br-2xl">
                 <div>

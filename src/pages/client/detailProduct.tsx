@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import Loading from "../../components/loading";
 import { IProductVariant } from "../../types/productVariant";
 import { CartItem } from "../../types/cart";
-import ClientLayout from "../../layouts/ClientLayout";
+import ClientLayout from "../../layouts/clientLayout";
 
 // Custom interface to match the actual data structure
 interface ProductVariantWithDetails extends Omit<IProductVariant, "productId"> {

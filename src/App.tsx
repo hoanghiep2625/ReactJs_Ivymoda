@@ -11,6 +11,8 @@ import CheckLogin from './components/CheckLogin'; //Nếu chưa đăng nhập th
 import Orders from './pages/client/orders';
 import Address from './pages/client/address';
 import Detail_order from './pages/client/detailOrder';
+import FavoriteProducts from './pages/client/favorite_products';
+import DetailUser from './pages/client/detailUser';
 
 function App() {
     const DetailProductWrapper = () => {
@@ -27,9 +29,11 @@ function App() {
         { path: '/products/:id', element: <DetailProductWrapper /> },
         { path: '/orders', element: <CheckLogin element={<Orders />} /> },
         { path: '/order-details/:id', element: <CheckLogin element={<Detail_order />} /> },
+        { path: '/user-details', element: <CheckLogin element={<DetailUser />} /> },
         { path: '/cart', element: <CheckLogin element={<Cart />} /> },
         { path: '/dathang', element: <CheckLogin element={<Dathang />} /> },
         { path: '/address', element: <CheckLogin element={<Address />} /> },
+        { path: '/favorite_products', element: <CheckLogin element={<FavoriteProducts />} /> },
     ]);
     return routes;
 }

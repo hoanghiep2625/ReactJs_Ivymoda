@@ -1,6 +1,6 @@
 import { Slideshow, SlideshowTwo } from "../../components/clientSlideShow";
 import ProductItemForm from "../../components/ProductItem";
-import ClientLayout from "../../layouts/ClientLayout";
+import ClientLayout from "../../layouts/clientLayout";
 
 const Slideshow1 = () => {
   const images1 = [
@@ -25,7 +25,7 @@ const Slideshow2 = () => {
 const Home = () => {
   return (
     <>
-      <ClientLayout>
+        <ClientLayout>
         <article className="mt-[82px]">
           {/* Promo banners */}
           <div className="grid grid-cols-1 sm:grid-cols-3 items-center justify-center pb-6 gap-2 sm:gap-0">

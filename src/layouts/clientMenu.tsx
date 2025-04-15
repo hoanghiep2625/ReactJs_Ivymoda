@@ -42,7 +42,7 @@ const MenuClient = () => {
       },
       {
         _id: "3",
-        name: "Trẻ Trâu",
+        name: "Trẻ Em",
         parentId: null,
         ancestors: [],
         level: 0,
@@ -189,7 +189,7 @@ const MenuClient = () => {
                 {isAuthenticated ? (
                   <>
                     <Link
-                      to="/account"
+                      to="/user-details"
                       className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
                     >
                       Thông tin tài khoản

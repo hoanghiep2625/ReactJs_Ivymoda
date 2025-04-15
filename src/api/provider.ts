@@ -36,12 +36,22 @@ export const deleteById = async ({ namespace, id }: ProviderProps) => {
     return null;
   }
 };
+
 export const postItem = async ({ namespace, values }: ProviderProps) => {
   try {
     const { data } = await axiosInstance.post(`/${namespace}`, values);
     return data;
   } catch (error) {
     console.error("Lỗi khi thêm sản phẩm:", error);
+    throw error;
+  }
+};
+export const putItem = async ({ namespace, values }: ProviderProps) => {
+  try {
+    const { data } = await axiosInstance.put(`/${namespace}`, values);
+    return data;
+  } catch (error) {
+    console.error("Lỗi cập nhật sản phẩm:", error);
     throw error;
   }
 };

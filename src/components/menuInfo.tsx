@@ -6,7 +6,7 @@ const MenuInfo = () => {
   const { auth } = useAuth();
 
   return (
-    <div className="p-8 w-[300px] font-bold border rounded-tl-[40px] rounded-br-[40px] border-gray-700 h-[370px]">
+    <div className="p-8 w-[300px] font-bold border rounded-tl-[40px] rounded-br-[40px] border-gray-700 h-[420px]">
       <nav>
         <div className="font-semibold text-gray-500 flex items-center gap-2 p-4">
           <img src="/images/useravt.png" className="w-8 h-8 rounded-full" alt="" />
@@ -23,7 +23,7 @@ const MenuInfo = () => {
               >
                 <path d="M304 128a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM49.3 464l349.5 0c-8.9-63.3-63.3-112-129-112l-91.4 0c-65.7 0-120.1 48.7-129 112zM0 482.3C0 383.8 79.8 304 178.3 304l91.4 0C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7L29.7 512C13.3 512 0 498.7 0 482.3z"></path>
               </svg>
-              <Link to="?action=info">Thông tin tài khoản</Link>
+              <Link to="/user-details">Thông tin tài khoản</Link>
             </div>
           </li>
           <li className="px-4 py-2">
@@ -48,6 +48,16 @@ const MenuInfo = () => {
                 <path d="M320 464c8.8 0 16-7.2 16-16l0-288-80 0c-17.7 0-32-14.3-32-32l0-80L64 48c-8.8 0-16 7.2-16 16l0 384c0 8.8 7.2 16 16 16l256 0zM0 64C0 28.7 28.7 0 64 0L229.5 0c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3L384 448c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 64z"></path>
               </svg>
               <Link to="/orders">Quản lý đơn hàng</Link>
+            </div>
+          </li>
+          <li className="px-4 py-2">
+            <div className="pb-6 font-[550] text-gray-500 text-[14px] flex gap-1 items-center hover:text-black transition-colors duration-200">
+            <svg className="w-3 h-3 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+              <path d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 
+              0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0
+               128 64 64 0 1 1 0-128z"/>
+               </svg>
+              <Link to="/address">Sổ địa chỉ</Link>
             </div>
           </li>
           <li className="px-4 py-2">
