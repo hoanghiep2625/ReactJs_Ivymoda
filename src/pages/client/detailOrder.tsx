@@ -12,6 +12,7 @@ const Detail_order = () => {
     queryKey: ["orders", id],
     queryFn: () => getById({ namespace: "orders", id: id }),
   });
+  // console.log("🚀 ~ constDetail_order= ~ data:", data);
   if (isLoading) {
     return <Loading />;
   }

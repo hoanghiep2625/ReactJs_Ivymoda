@@ -11,8 +11,8 @@ const Orders = () => {
     queryKey: ["orders"],
     queryFn: async () => getList({ namespace: "orders/" }),
   });
+  console.log("🚀 ~ Orders ~ data:", data);
   const user = useAuth();
-
   if (isLoading) {
     return <Loading />;
   }
@@ -63,8 +63,8 @@ const Orders = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {data?.orders?.length > 0 ? (
-                  data.orders.map((order: any, index: any) => (
+                {data?.data?.length > 0 ? (
+                  data.data.map((order: any, index: any) => (
                     <tr
                       key={index}
                       className="hover:bg-gray-50 transition-colors duration-200"

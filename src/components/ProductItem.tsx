@@ -40,7 +40,7 @@ const ProductItemForm: React.FC<ProductItemFormProps> = ({ namespace }) => {
     staleTime: 60 * 1000,
   });
 
-  const productVariants: ProductVariantWithDetails[] = data?.docs || [];
+  const productVariants: ProductVariantWithDetails[] = data?.data || [];
   // const { addToCart } = useCart(); // Hook để thêm vào giỏ hàng (giả định)
 
   // Hàm xử lý thêm vào giỏ hàng
