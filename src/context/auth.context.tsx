@@ -30,7 +30,9 @@ interface AuthContextType {
 }
 
 // Tạo context
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined
+);
 
 // Custom hook để dùng context
 export const useAuth = () => {
@@ -123,7 +125,7 @@ export const AuthWrapper = ({ children }: AuthWrapperProps) => {
     }
   }, [data, error, isLoading]);
 
-  // Hiển thị loading khi đang xác thực
+  // // Hiển thị loading khi đang xác thực
   if (auth.isAuthenticating) {
     return <Loading />;
   }
