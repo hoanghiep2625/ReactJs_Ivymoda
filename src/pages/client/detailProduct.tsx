@@ -2,28 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../context/auth.context";
 import { toast } from "react-toastify";
-import { getById } from "../../api/provider";
+import { getById, postItem } from "../../api/provider";
 import { addToCart } from "../../services/userService";
 import { Rate } from "antd";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/loading";
-import { IProductVariant } from "../../types/productVariant";
 import { CartItem } from "../../types/cart";
 import ClientLayout from "../../layouts/ClientLayout";
-
-// Custom interface to match the actual data structure
-interface ProductVariantWithDetails extends Omit<IProductVariant, "productId"> {
-  productId: {
-    _id: string;
-    name: string;
-    categoryId: string;
-    shortDescription?: string;
-    description?: string;
-    sku: string;
-    createdAt: string;
-    updatedAt: string;
-  };
-}
+import ProductItemForm from "../../components/ProductItem";
 
 const DetailProduct = ({ productId }: { productId: string }) => {
   const queryClient = useQueryClient();
@@ -42,13 +28,23 @@ const DetailProduct = ({ productId }: { productId: string }) => {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("gioi_thieu");
+  const formData = new FormData();
+  const mutation = useMutation({
+    mutationFn: () =>
+      postItem({
+        namespace: `auth/products/${productId}/view`,
+        values: formData,
+      }),
+    onError: (error) => {
+      toast.error("Có lỗi xảy ra: " + error.message);
+    },
+  });
 
   useEffect(() => {
+    mutation.mutate();
     if (product) {
-      // Set the color to the current product's color
       setSelectedColor(product.color.colorName);
 
-      // Set the first available size
       const firstAvailableSize = product.sizes.find(
         (size: { stock: number }) => size.stock > 0
       );
@@ -371,7 +367,13 @@ const DetailProduct = ({ productId }: { productId: string }) => {
               </div>
             </div>
           </div>
-
+          <p className="text-center font-semibold text-xl sm:text-2xl md:text-3xl pb-1 sm:pb-2">
+            Sản phẩm đã xem
+          </p>
+          {/* Product Items for Collection */}
+          <div className="w-full">
+            <ProductItemForm namespace="recently-viewed" />
+          </div>
           <div>
             <img
               src="/images/banner1.3.webp"
