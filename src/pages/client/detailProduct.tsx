@@ -5,11 +5,12 @@ import { toast } from "react-toastify";
 import { getById, postItem } from "../../api/provider";
 import { addToCart } from "../../services/userService";
 import { Rate } from "antd";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Loading from "../../components/loading";
 import { CartItem } from "../../types/cart";
 import ClientLayout from "../../layouts/ClientLayout";
 import ProductItemForm from "../../components/ProductItem";
+import { usePostItem } from "../../hooks/usePostItem";
 
 const DetailProduct = ({ productId }: { productId: string }) => {
   const queryClient = useQueryClient();
@@ -29,19 +30,17 @@ const DetailProduct = ({ productId }: { productId: string }) => {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("gioi_thieu");
   const formData = new FormData();
-  const mutation = useMutation({
-    mutationFn: () =>
-      postItem({
-        namespace: `auth/products/${productId}/view`,
-        values: formData,
-      }),
-    onError: (error) => {
-      toast.error("Có lỗi xảy ra: " + error.message);
+  const postItemMutation = usePostItem({ showToast: false });
+  const [colors, setColors] = useState<any[]>([]);
+
+  const postItemGetColorsMutation = usePostItem({
+    showToast: false,
+    onSuccess: (fetchedColors: any) => {
+      setColors(fetchedColors);
     },
   });
 
   useEffect(() => {
-    mutation.mutate();
     if (product) {
       setSelectedColor(product.color.colorName);
 
@@ -55,7 +54,24 @@ const DetailProduct = ({ productId }: { productId: string }) => {
       }
     }
   }, [product]);
+  const idProduct = product?.productId?._id;
+  useEffect(() => {
+    if (idProduct) {
+      postItemGetColorsMutation.mutate({
+        namespace: `product-variants/colors-product/${idProduct}`,
+        values: { productId: idProduct },
+      });
+    }
+  }, [idProduct]);
 
+  useEffect(() => {
+    if (productId && formData) {
+      postItemMutation.mutate({
+        namespace: `auth/products/${productId}/view`,
+        values: formData,
+      });
+    }
+  }, [productId]);
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
   };
@@ -94,7 +110,6 @@ const DetailProduct = ({ productId }: { productId: string }) => {
   if (error)
     return <div>Error loading product: {(error as Error).message}</div>;
   if (!product) return <div>Product not found</div>;
-
   return (
     <>
       <ClientLayout>
@@ -172,23 +187,18 @@ const DetailProduct = ({ productId }: { productId: string }) => {
               <div className="text-xl font-[550] my-4">
                 Màu sắc: {product.color.colorName}
               </div>
-              <div className="flex gap-2 py-2">
-                <div
-                  className="rounded-full w-5 h-5 relative flex items-center justify-center border border-gray-300"
-                  style={{ backgroundColor: product.color.actualColor }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={`w-3 h-3 fill-current ${
-                      product.color.actualColor === "#fafafa"
-                        ? "text-gray-400"
-                        : "text-white"
-                    }`}
-                    viewBox="0 0 448 512"
-                  >
-                    <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
-                  </svg>
-                </div>
+              <div className="flex gap-2">
+                {colors?.map((color: any) => (
+                  <Link
+                    key={color._id}
+                    to={`/products/${color._id}`}
+                    className="rounded-full w-5 h-5 border border-gray-300"
+                    style={{
+                      backgroundColor: color.actualColor,
+                    }}
+                    title={color.actualColor}
+                  ></Link>
+                ))}
               </div>
               <div className="flex gap-4 my-4">
                 {product.sizes.map(

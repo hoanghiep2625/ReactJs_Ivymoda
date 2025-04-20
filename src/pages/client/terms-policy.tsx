@@ -1,4 +1,3 @@
-import React from "react";
 import ClientLayout from "../../layouts/ClientLayout";
 
 const TermsPolicy = () => {

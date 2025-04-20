@@ -14,6 +14,7 @@ import Detail_order from "./pages/client/detailOrder";
 import FavoriteProducts from "./pages/client/favorite_products";
 import DetailUser from "./pages/client/detailUser";
 import TermsPolicy from "./pages/client/terms-policy";
+import BuyingGuide from "./pages/client/buying-guide";
 
 function App() {
   const DetailProductWrapper = () => {
@@ -28,6 +29,7 @@ function App() {
     { path: "/login", element: <Login /> },
     { path: "/register", element: <Register /> },
     { path: "/terms-policy", element: <TermsPolicy /> },
+    { path: "/buying-guide", element: <BuyingGuide /> },
     { path: "/products/:id", element: <DetailProductWrapper /> },
     { path: "/orders", element: <CheckLogin element={<Orders />} /> },
     {

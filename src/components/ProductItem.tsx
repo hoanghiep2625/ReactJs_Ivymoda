@@ -1,30 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { getList } from "../api/provider";
 import { useQuery } from "@tanstack/react-query";
-import { IProduct, IProductDetail } from "../types/product";
-import {
-  IProductVariant,
-  IColor,
-  IImages,
-  ISize,
-} from "../types/productVariant";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { Autoplay } from "swiper/modules";
 import { Link } from "react-router-dom";
-// import { useCart } from "../context/CartContext"; // Giả sử bạn có CartContext
+import { usePostItem } from "../hooks/usePostItem";
 
-// Custom interface to match the actual data structure
-interface ProductVariantWithDetails extends Omit<IProductVariant, "productId"> {
+interface ProductVariantWithDetails {
+  _id: string;
+  images: {
+    main: { url: string };
+    hover: { url: string };
+  };
+  color: {
+    actualColor: string;
+    colorName: string;
+  };
+  price: number;
   productId: {
     _id: string;
     name: string;
-    categoryId: string;
-    shortDescription?: string;
-    description?: string;
-    sku: string;
-    createdAt: string;
-    updatedAt: string;
   };
 }
 
@@ -41,13 +37,39 @@ const ProductItemForm: React.FC<ProductItemFormProps> = ({ namespace }) => {
   });
 
   const productVariants: ProductVariantWithDetails[] = data?.data || [];
-  // const { addToCart } = useCart(); // Hook để thêm vào giỏ hàng (giả định)
+  const [colorsByProductId, setColorsByProductId] = useState<{
+    [key: string]: { _id: string; actualColor: string }[];
+  }>({});
 
-  // Hàm xử lý thêm vào giỏ hàng
-  // const handleAddToCart = (variantId: string) => {
-  //     addToCart(variantId, 1); // Thêm 1 sản phẩm vào giỏ hàng
-  //     alert("Đã thêm sản phẩm vào giỏ hàng!"); // Thông báo tạm thời
-  // };
+  // Function to fetch colors by productId
+  const fetchColorsByProductId = async (productId: string) => {
+    try {
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_URL
+        }/product-variants/colors-product/${productId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ productId }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch colors");
+      }
+
+      const colors = await response.json();
+      setColorsByProductId((prev) => ({
+        ...prev,
+        [productId]: colors,
+      }));
+    } catch (error) {
+      console.error("Error fetching colors:", error);
+    }
+  };
 
   return (
     <div className="mb-8">
@@ -78,13 +100,14 @@ const ProductItemForm: React.FC<ProductItemFormProps> = ({ namespace }) => {
                 </SwiperSlide>
               ))
           : productVariants.map((variant: ProductVariantWithDetails) => {
-              console.log("variant", variant);
-
-              // Skip rendering if variant or variant.productId is undefined
               if (!variant || !variant.productId) {
                 return null;
               }
 
+              // Fetch colors for the current productId if not already fetched
+              if (!colorsByProductId[variant.productId._id]) {
+                fetchColorsByProductId(variant.productId._id);
+              }
               return (
                 <SwiperSlide key={variant._id} className="relative">
                   <div className="relative">
@@ -109,15 +132,18 @@ const ProductItemForm: React.FC<ProductItemFormProps> = ({ namespace }) => {
                     </Link>
                     <div className="flex gap-2 py-2 justify-between items-center pt-4">
                       <div className="flex gap-2">
-                        {/* Hiển thị màu của variant */}
-                        {variant.color && (
-                          <div
-                            className="rounded-full w-5 h-5"
-                            style={{
-                              backgroundColor: variant.color.actualColor,
-                            }}
-                            title={variant.color.colorName || "Màu sắc"}
-                          ></div>
+                        {colorsByProductId[variant.productId._id]?.map(
+                          (color) => (
+                            <Link
+                              key={color._id}
+                              to={`/products/${color._id}`}
+                              className="rounded-full w-5 h-5 border border-gray-300"
+                              style={{
+                                backgroundColor: color.actualColor,
+                              }}
+                              title={color.actualColor}
+                            ></Link>
+                          )
                         )}
                       </div>
                       <div>
@@ -140,20 +166,6 @@ const ProductItemForm: React.FC<ProductItemFormProps> = ({ namespace }) => {
                     </Link>
                     <div className="font-semibold pt-4">
                       {variant.price?.toLocaleString()}đ
-                    </div>
-                    <div className="absolute right-0 bottom-0">
-                      <button
-                        //   onClick={() => handleAddToCart(variant._id)}
-                        className="w-8 h-8 bg-black hover:bg-white border border-transparent hover:border-black rounded-tl-[10px] rounded-br-[10px] flex items-center justify-center transition-all duration-300 group"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 576 512"
-                          className="w-4 h-4 fill-current text-white group-hover:text-black transition-all duration-300"
-                        >
-                          <path d="M0 24C0 10.7 10.7 0 24 0L69.5 0c22 0 41.5 12.8 50.6 32l411 0c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3l-288.5 0 5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5L488 336c13.3 0 24 10.7 24 24s-10.7 24-24 24l-288.3 0c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5L24 48C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96zM252 160c0 11 9 20 20 20l44 0 0 44c0 11 9 20 20 20s20-9 20-20l0-44 44 0c11 0 20-9 20-20s-9-20-20-20l-44 0 0-44c0-11-9-20-20-20s-20 9-20 20l0 44-44 0c-11 0-20 9-20 20z" />
-                        </svg>
-                      </button>
                     </div>
                   </div>
                 </SwiperSlide>
