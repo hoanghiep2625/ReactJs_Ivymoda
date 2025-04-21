@@ -41,10 +41,7 @@ const Login = () => {
           role: data?.user?.role ?? "",
         },
       });
-      toast.success("Đăng nhập thành công!", {
-        position: "top-right",
-        autoClose: 2000,
-      });
+      toast.success("Đăng nhập thành công!");
 
       queryClient.invalidateQueries({ queryKey: ["user"] });
 
@@ -56,20 +53,14 @@ const Login = () => {
       if (axios.isAxiosError(err) && err.response) {
         const errorData = err.response.data as { errors?: string[] };
         const errorMessage = errorData.errors?.[0] || "Đăng nhập thất bại!";
-        toast.error(errorMessage, {
-          position: "top-right",
-          autoClose: 3000,
-        });
+        toast.error(errorMessage);
 
         setErrors({
           email: errorMessage.includes("email") ? errorMessage : "",
           password: errorMessage.includes("mật khẩu") ? errorMessage : "",
         });
       } else {
-        toast.error("Có lỗi xảy ra. Vui lòng kiểm tra kết nối!", {
-          position: "top-right",
-          autoClose: 3000,
-        });
+        toast.error("Có lỗi xảy ra. Vui lòng kiểm tra kết nối!");
       }
     },
   });

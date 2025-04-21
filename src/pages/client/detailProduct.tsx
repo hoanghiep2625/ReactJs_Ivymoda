@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../context/auth.context";
 import { toast } from "react-toastify";
-import { getById, postItem } from "../../api/provider";
+import { getById, getList, postItem } from "../../api/provider";
 import { addToCart } from "../../services/userService";
 import { Rate } from "antd";
 import { Link, useNavigate } from "react-router-dom";
@@ -105,6 +105,14 @@ const DetailProduct = ({ productId }: { productId: string }) => {
   const isOutOfStock =
     product?.sizes.every((size: { stock: number }) => size.stock === 0) ||
     false;
+  const { data: categories, isLoading: isLoadingCategories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () =>
+      getList({
+        namespace: `categories/parent/${product.productId.categoryId}`,
+      }),
+  });
+  console.log("🚀 ~ DetailProduct ~ categories:", categories);
 
   if (isLoading) return <Loading />;
   if (error)
@@ -118,10 +126,14 @@ const DetailProduct = ({ productId }: { productId: string }) => {
             <div className="text-sm">
               <a href="?action=home">Trang chủ</a>
             </div>
-            <div className="text-sm">-</div>
-            <div className="text-sm">Danh mục cha</div>
-            <div className="text-sm">-</div>
-            <div className="text-sm">Danh mục con</div>
+
+            {categories?.data.map((item: any) => (
+              <div key={item._id} className="text-sm">
+                <div className="text-sm flex gap-4">
+                  <div>-</div> {item.name}
+                </div>
+              </div>
+            ))}
           </div>
           <hr className="mb-8" />
 
@@ -377,7 +389,7 @@ const DetailProduct = ({ productId }: { productId: string }) => {
               </div>
             </div>
           </div>
-          <p className="text-center font-semibold text-xl sm:text-2xl md:text-3xl pb-1 sm:pb-2">
+          <p className="text-center font-semibold py-4 text-xl sm:text-2xl md:text-3xl md:py-8 sm:py-8">
             Sản phẩm đã xem
           </p>
           {/* Product Items for Collection */}

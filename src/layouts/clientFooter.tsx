@@ -148,12 +148,12 @@ const Footer = () => {
                 </Link>
               </p>
               <p className="py-2">
-                <a
+                <Link
                   className="text-sm font-[300] hover:text-orange-600 transition-all duration-300 cursor-pointer"
-                  href="?action=chinhsachthanhtoan"
+                  to="/payment-policy"
                 >
                   Chính sách thanh toán
-                </a>
+                </Link>
               </p>
               <p className="py-2">
                 <a
