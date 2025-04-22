@@ -6,6 +6,7 @@ import { logout } from "../services/userService";
 import { toast } from "react-toastify";
 import useCartQuantity from "../hooks/useCartQuantity";
 import { getList } from "../api/provider";
+import Loading from "../components/loading";
 
 // Định nghĩa kiểu dữ liệu cho danh mục
 interface Category {
@@ -75,7 +76,7 @@ const MenuClient = () => {
     };
   }, [isUserMenuOpen]);
 
-  if (isLoading) return <p>Đang tải danh mục...</p>;
+  if (isLoading) return <Loading />;
   if (error) return <p>Lỗi khi tải danh mục!</p>;
   if (!categories?.data || categories.data.length === 0) {
     return <p>Không có danh mục nào để hiển thị.</p>;

@@ -16,6 +16,7 @@ import DetailUser from "./pages/client/detailUser";
 import TermsPolicy from "./pages/client/terms-policy";
 import BuyingGuide from "./pages/client/buying-guide";
 import PaymentPolicy from "./pages/client/payment-policy";
+import ReturnPolicy from "./pages/client/return-policy";
 
 function App() {
   const DetailProductWrapper = () => {
@@ -32,7 +33,7 @@ function App() {
     { path: "/terms-policy", element: <TermsPolicy /> },
     { path: "/buying-guide", element: <BuyingGuide /> },
     { path: "/payment-policy", element: <PaymentPolicy /> },
-
+    { path: "/return-policy", element: <ReturnPolicy /> },
     { path: "/products/:id", element: <DetailProductWrapper /> },
     { path: "/orders", element: <CheckLogin element={<Orders />} /> },
     {

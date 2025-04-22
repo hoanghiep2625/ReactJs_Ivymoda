@@ -156,12 +156,12 @@ const Footer = () => {
                 </Link>
               </p>
               <p className="py-2">
-                <a
+                <Link
                   className="text-sm font-[300] hover:text-orange-600 transition-all duration-300 cursor-pointer"
-                  href="?action=chinhsachdoitra"
+                  to="/return-policy"
                 >
                   Chính sách đổi trả
-                </a>
+                </Link>
               </p>
               <p className="py-2">
                 <a
