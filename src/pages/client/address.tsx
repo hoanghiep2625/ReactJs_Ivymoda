@@ -1,7 +1,7 @@
 import MenuInfo from "../../components/menuInfo";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getList, postItem } from "../../api/provider";
-import ClientLayout from "../../layouts/ClientLayout";
+import ClientLayout from "../../layouts/clientLayout";
 import React, { useEffect, useState } from "react";
 import { City, District, Ward } from "../../types/city";
 import { z } from "zod";

@@ -4,7 +4,7 @@ import { getList } from "../../api/provider";
 import { useAuth } from "../../context/auth.context";
 import Loading from "../../components/loading";
 import MenuInfo from "../../components/menuInfo";
-import ClientLayout from "../../layouts/ClientLayout";
+import ClientLayout from "../../layouts/clientLayout";
 
 const Orders = () => {
   const { data, isLoading, error } = useQuery({

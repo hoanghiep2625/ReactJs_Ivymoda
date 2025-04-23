@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import MenuInfo from "../../components/menuInfo";
-import ClientLayout from "../../layouts/ClientLayout";
+import ClientLayout from "../../layouts/clientLayout";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getList, putItem } from "../../api/provider";
 import { z } from "zod";

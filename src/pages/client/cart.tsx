@@ -6,7 +6,7 @@ import { useAuth } from "../../context/auth.context";
 import { toast } from "react-toastify";
 import { getList } from "../../api/provider";
 import Loading from "../../components/loading";
-import ClientLayout from "../../layouts/ClientLayout";
+import ClientLayout from "../../layouts/clientLayout";
 
 const Cart = () => {
   const queryClient = useQueryClient();

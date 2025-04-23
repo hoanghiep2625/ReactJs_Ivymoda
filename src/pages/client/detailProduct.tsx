@@ -8,8 +8,8 @@ import { Rate } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import Loading from "../../components/loading";
 import { CartItem } from "../../types/cart";
-import ClientLayout from "../../layouts/ClientLayout";
-import ProductItemForm from "../../components/ProductItem";
+import ClientLayout from "../../layouts/clientLayout";
+import ProductItemForm from "../../components/productItem";
 import { usePostItem } from "../../hooks/usePostItem";
 
 const DetailProduct = ({ productId }: { productId: string }) => {
@@ -32,6 +32,14 @@ const DetailProduct = ({ productId }: { productId: string }) => {
   const formData = new FormData();
   const postItemMutation = usePostItem({ showToast: false });
   const [colors, setColors] = useState<any[]>([]);
+
+  const { data: wishlistData, isLoading: isWishlistLoading } = useQuery({
+    queryKey: ["wishlist"],
+    queryFn: async () => getList({ namespace: "wishlist" }),
+    staleTime: 60 * 1000,
+  });
+  const wishlistIds: string[] =
+    wishlistData?.wishlist?.products?.map((item: any) => item._id) || [];
 
   const postItemGetColorsMutation = usePostItem({
     showToast: false,
@@ -67,7 +75,7 @@ const DetailProduct = ({ productId }: { productId: string }) => {
   useEffect(() => {
     if (productId && formData) {
       postItemMutation.mutate({
-        namespace: `auth/products/${productId}/view`,
+        namespace: `recently-viewed/products/${productId}/view`,
         values: formData,
       });
     }
@@ -75,7 +83,37 @@ const DetailProduct = ({ productId }: { productId: string }) => {
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
   };
+  const addWishListMutation = usePostItem({
+    showToast: false,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+    },
+  });
 
+  const removeWishListMutation = usePostItem({
+    showToast: false,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+    },
+  });
+
+  const addWishList = (id: string) => {
+    if (id) {
+      addWishListMutation.mutate({
+        namespace: `wishlist/${id}`,
+        values: new FormData(),
+      });
+    }
+  };
+
+  const removeWishList = (id: string) => {
+    if (id) {
+      removeWishListMutation.mutate({
+        namespace: `wishlist/remove/${id}`,
+        values: new FormData(),
+      });
+    }
+  };
   const addToCartMutation = useMutation({
     mutationFn: addToCart,
     onSuccess: () => {
@@ -106,13 +144,12 @@ const DetailProduct = ({ productId }: { productId: string }) => {
     product?.sizes.every((size: { stock: number }) => size.stock === 0) ||
     false;
   const { data: categories, isLoading: isLoadingCategories } = useQuery({
-    queryKey: ["categories"],
+    queryKey: ["categories-parent"],
     queryFn: async () =>
       getList({
         namespace: `categories/parent/${product.productId.categoryId}`,
       }),
   });
-  console.log("🚀 ~ DetailProduct ~ categories:", categories);
 
   if (isLoading) return <Loading />;
   if (error)
@@ -267,7 +304,7 @@ const DetailProduct = ({ productId }: { productId: string }) => {
                   </button>
                 </div>
               </div>
-              <div className="flex gap-4 mb-20">
+              <div className="flex items-center gap-4 mb-20">
                 <div
                   className={`my-4 text-lg font-semibold w-[174px] h-[48px] rounded-tl-[15px] rounded-br-[15px] flex justify-center items-center transition-all duration-300 ${
                     isOutOfStock
@@ -321,14 +358,56 @@ const DetailProduct = ({ productId }: { productId: string }) => {
                 >
                   {isOutOfStock ? "Hết hàng" : "Mua hàng"}
                 </div>
-                <div className="bg-white my-4 text-lg font-semibold text-black border border-black w-[46px] h-[46px] rounded-tl-[15px] rounded-br-[15px] flex justify-center items-center hover:bg-black hover:text-white transition-all duration-300 group cursor-pointer">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 512 512"
-                    className="w-5 h-5 transition-all duration-300 group-hover:fill-white group-hover:scale-110"
+                <div className="relative">
+                  {/* Nút Thêm vào wishlist */}
+                  <button
+                    onClick={() => addWishList(product._id)}
+                    className={`add-wishlist bg-white border border-black w-[46px] h-[46px] rounded-tl-[15px] rounded-br-[15px] flex justify-center items-center hover:bg-black transition-all duration-300 group cursor-pointer ${
+                      wishlistIds.includes(product._id) ? "hidden" : ""
+                    }`}
+                    data-id={product._id}
+                    aria-label={`Thêm ${product.productId.name} vào danh sách yêu thích`}
+                    type="button"
+                    disabled={addWishListMutation.isPending}
                   >
-                    <path d="M225.8 468.2l-2.5-2.3L48.1 303.2C17.4 274.7 0 234.7 0 192.8l0-3.3c0-70.4 50-130.8 119.2-144C158.6 37.9 198.9 47 231 69.6c9 6.4 17.4 13.8 25 22.3c4.2-4.8 8.7-9.2 13.5-13.3c3.7-3.2 7.5-6.2 11.5-9c0 0 0 0 0 0C313.1 47 353.4 37.9 392.8 45.4C462 58.6 512 119.1 512 189.5l0 3.3c0 41.9-17.4 81.9-48.1 110.4L288.7 465.9l-2.5 2.3c-8.2 7.6-19 11.9-30.2 11.9s-22-4.2-30.2-11.9zM239.1 145c-.4-.3-.7-.7-1-1.1l-17.8-20-.1-.1s0 0 0 0c-23.1-25.9-58-37.7-92-31.2C81.6 101.5 48 142.1 48 189.5l0 3.3c0 28.5 11.9 55.8 32.8 75.2L256 430.7 431.2 268c20.9-19.4 32.8-46.7 32.8-75.2l0-3.3c0-47.3-33.6-88-80.1-96.9c-34-6.5-69 5.4-92 31.2c0 0 0 0-.1 .1s0 0-.1 .1l-17.8 20c-.3 .4-.7 .7-1 1.1c-4.5 4.5-10.6 7-16.9 7s-12.4-2.5-16.9-7z" />
-                  </svg>
+                    <img
+                      src="/images/heart.png"
+                      alt="Thêm vào danh sách yêu thích"
+                      className="w-4 h-4 transition-all duration-300 group-hover:hidden"
+                      aria-hidden="true"
+                    />
+                    <img
+                      src="/images/heart-border-white.png"
+                      alt="Thêm vào danh sách yêu thích (hover)"
+                      className="w-4 h-4 transition-all duration-300 hidden group-hover:block"
+                      aria-hidden="true"
+                    />
+                  </button>
+
+                  {/* Nút Xóa khỏi wishlist */}
+                  <button
+                    onClick={() => removeWishList(product._id)}
+                    className={`remove-wishlist bg-white border border-black w-[46px] h-[46px] rounded-tl-[15px] rounded-br-[15px] flex justify-center items-center hover:bg-black transition-all duration-300 group cursor-pointer ${
+                      wishlistIds.includes(product._id) ? "" : "hidden"
+                    }`}
+                    data-id={product._id}
+                    aria-label={`Xóa ${product.productId.name} khỏi danh sách yêu thích`}
+                    type="button"
+                    disabled={removeWishListMutation.isPending}
+                  >
+                    <img
+                      src="/images/heart-black.png"
+                      alt="Xóa khỏi danh sách yêu thích"
+                      className="w-4 h-4 transition-all duration-300 group-hover:hidden"
+                      aria-hidden="true"
+                    />
+                    <img
+                      src="/images/heart-white.png"
+                      alt="Xóa khỏi danh sách yêu thích (hover)"
+                      className="w-4 h-4 transition-all duration-300 hidden group-hover:block"
+                      aria-hidden="true"
+                    />
+                  </button>
                 </div>
               </div>
 

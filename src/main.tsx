@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthWrapper } from "./context/auth.context.tsx";
+import ScrollToTop from "./components/scrollToTop.tsx";
 
 // Tạo QueryClient instance
 const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ root.render(
       <AuthWrapper>
         <BrowserRouter>
           <HelmetProvider>
+            <ScrollToTop />
             <App />
             <ToastContainer
               position="bottom-right"

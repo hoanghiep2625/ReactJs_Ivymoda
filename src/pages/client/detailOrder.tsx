@@ -4,7 +4,7 @@ import MenuInfo from "../../components/menuInfo";
 import { useQuery } from "@tanstack/react-query";
 import { getById } from "../../api/provider";
 import Loading from "../../components/loading";
-import ClientLayout from "../../layouts/ClientLayout";
+import ClientLayout from "../../layouts/clientLayout";
 
 const Detail_order = () => {
   const { id } = useParams();
