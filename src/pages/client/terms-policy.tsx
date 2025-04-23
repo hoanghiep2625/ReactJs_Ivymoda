@@ -1,4 +1,4 @@
-import ClientLayout from "../../layouts/clientLayout1";
+import ClientLayout from "../../layouts/clientLayout";
 
 const TermsPolicy = () => {
   return (
