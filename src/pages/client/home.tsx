@@ -1,6 +1,6 @@
 import { Slideshow, SlideshowTwo } from "../../components/clientSlideShow";
-import ProductItemForm from "../../components/productItem";
-import ClientLayout from "../../layouts/clientLayout";
+import ProductItemForm from "../../components/productItem1";
+import ClientLayout from "../../layouts/clientLayout1";
 
 const Slideshow1 = () => {
   const images1 = [

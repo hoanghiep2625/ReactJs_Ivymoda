@@ -8,8 +8,8 @@ import { Rate } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import Loading from "../../components/loading";
 import { CartItem } from "../../types/cart";
-import ClientLayout from "../../layouts/clientLayout";
-import ProductItemForm from "../../components/productItem";
+import ClientLayout from "../../layouts/clientLayout1";
+import ProductItemForm from "../../components/productItem1";
 import { usePostItem } from "../../hooks/usePostItem";
 
 const DetailProduct = ({ productId }: { productId: string }) => {

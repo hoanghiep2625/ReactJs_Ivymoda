@@ -1,5 +1,5 @@
 import ClientFooterDongHanh from "../../layouts/clientFooter-Dong-Hanh";
-import ClientLayout from "../../layouts/clientLayout";
+import ClientLayout from "../../layouts/clientLayout1";
 
 const PaymentPolicy = () => {
   return (

@@ -9,7 +9,7 @@ import Loading from "../../components/loading";
 import axiosInstance from "../../services/axiosInstance";
 import moment from "moment";
 import { useGHNMapper } from "../../utils/ghnMapping";
-import ClientLayout from "../../layouts/clientLayout";
+import ClientLayout from "../../layouts/clientLayout1";
 
 const Dathang = () => {
   const queryClient = useQueryClient();
