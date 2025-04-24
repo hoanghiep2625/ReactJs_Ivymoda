@@ -5,10 +5,11 @@ import react from "@vitejs/plugin-react-swc";
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
-    include: ["swiper"], // Đảm bảo rằng Swiper được tối ưu hóa
+    include: ["swiper"],
   },
   server: {
-    host: "0.0.0.0", // Listen trên tất cả interfaces
-    port: 5173, // Đảm bảo cổng là 5173
+    host: "0.0.0.0",
+    port: 5173,
+    allowedHosts: ["ivymoda.tahoanghiep.com"], // 👈 thêm dòng này
   },
 });
