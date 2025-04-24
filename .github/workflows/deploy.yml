@@ -20,4 +20,4 @@ jobs:
 
       - name: Deploy to VPS
         run: |
-          ssh -o StrictHostKeyChecking=no user@your-vps-ip 'cd /path/to/your/project && git pull && npm install && npm run build && pm2 restart your-app'
+              ssh -o StrictHostKeyChecking=no root@14.225.198.220 'cd /home/root/Ivymoda/Client && git pull && npm install && npm run build && pm2 restart your-app'
