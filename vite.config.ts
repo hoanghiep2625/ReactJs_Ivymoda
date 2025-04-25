@@ -10,6 +10,17 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: 5173,
-    allowedHosts: ["ivymoda.tahoanghiep.com"], // 👈 thêm dòng này
+    allowedHosts: [
+      "ivymoda.tahoanghiep.com",
+      "admin.ivymoda.tahoanghiep.com", // Thêm để hỗ trợ cả server admin
+    ],
+  },
+  preview: {
+    host: "0.0.0.0",
+    port: 5173,
+    allowedHosts: [
+      "ivymoda.tahoanghiep.com",
+      "admin.ivymoda.tahoanghiep.com", // Thêm để hỗ trợ cả server admin
+    ],
   },
 });
