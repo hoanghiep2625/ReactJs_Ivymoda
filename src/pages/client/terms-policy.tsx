@@ -24,7 +24,7 @@ const TermsPolicy = () => {
                   className="leading-[15px] text-[14px] font-semibold text-gray-500 block hover:text-black"
                   href="#"
                 >
-                  Về IVY moda
+                  Về ELA via
                 </a>
                 <br />
                 <a
@@ -71,14 +71,14 @@ const TermsPolicy = () => {
             </div>
             <br />
             <div className="text-lg font-semibold">
-              1. IVYMODA.COM LÀ WEBSITE CỦA THƯƠNG HIỆU THỜI TRANG IVY MODA
+              1. Elavia.COM LÀ WEBSITE CỦA THƯƠNG HIỆU THỜI TRANG ELA via
             </div>
             <br />
             <div className="font-xs text-[#6c757d]">
-              IVYmoda.com là kênh mua sắm và hỗ trợ đắc lực công tác chăm sóc
-              Khách Hàng của Thương hiệu thời trang IVY moda;
+              Elavia.com là kênh mua sắm và hỗ trợ đắc lực công tác chăm sóc
+              Khách Hàng của Thương hiệu thời trang ELA via;
               <br />
-              Kể từ khi ra mắt vào cuối năm 2021, IVYmoda.com đã - đang và sẽ
+              Kể từ khi ra mắt vào cuối năm 2021, Elavia.com đã - đang và sẽ
               không ngừng cải tiến và nâng cấp để ngày một hoàn thiện tính năng,
               thân thiện nhất với Khách Hàng.
             </div>
@@ -106,15 +106,15 @@ const TermsPolicy = () => {
             <div className="text-lg font-semibold">QUYỀN LỢI</div>
             <br />
             <div className="font-xs text-[#6c757d]">
-              Giảm 10% khi mua hàng tại hệ thống IVY moda trong vòng 01 năm kể
-              từ ngày đạt hạng thẻ
+              Giảm 10% khi mua hàng tại hệ thống ELA via trong vòng 01 năm kể từ
+              ngày đạt hạng thẻ
               <br />
               Nhận quà tặng sinh nhật của khách hàng, kèm theo những chính sách
               ưu đãi dành riêng cho khách hàng VIP vào các dịp lễ đặc biệt.
               <br />
               Khách hàng sẽ được nhận thêm các ưu đãi hấp dẫn từ các đối tác của
-              IVY Moda trong các lĩnh vực: Mỹ Phẩm, Nước hoa, Trang sức, Beauty
-              - Spa, Nhà hàng, Tạp chí…
+              ELA via trong các lĩnh vực: Mỹ Phẩm, Nước hoa, Trang sức, Beauty -
+              Spa, Nhà hàng, Tạp chí…
             </div>
             <br />
             <div className="text-base font-semibold">2.2 THẺ VÀNG / GOLD</div>
@@ -137,15 +137,15 @@ const TermsPolicy = () => {
             <div className="text-lg font-semibold">QUYỀN LỢI</div>
             <br />
             <div className="font-xs text-[#6c757d]">
-              Giảm 20% khi mua hàng tại hệ thống IVY moda trong vòng 01 năm kể
-              từ ngày đạt hạng thẻ
+              Giảm 20% khi mua hàng tại hệ thống ELA via trong vòng 01 năm kể từ
+              ngày đạt hạng thẻ
               <br />
               Nhận quà tặng sinh nhật của khách hàng, kèm theo những chính sách
               ưu đãi dành riêng cho khách hàng VIP vào các dịp lễ đặc biệt.
               <br />
               Khách hàng sẽ được nhận thêm các ưu đãi hấp dẫn từ các đối tác của
-              IVY Moda trong các lĩnh vực: Mỹ Phẩm, Nước hoa, Trang sức, Beauty
-              – Spa, Nhà hàng, Tạp chí…
+              ELA via trong các lĩnh vực: Mỹ Phẩm, Nước hoa, Trang sức, Beauty –
+              Spa, Nhà hàng, Tạp chí…
             </div>
             <br />
             <div className="text-base font-semibold">
@@ -167,16 +167,16 @@ const TermsPolicy = () => {
             <div className="text-lg font-semibold">QUYỀN LỢI</div>
             <br />
             <div className="font-xs text-[#6c757d]">
-              Giảm 30% khi mua hàng tại hệ thống IVY moda trong vòng 01 năm kể
-              từ ngày đạt hạng thẻ. Ngoài Chiết khấu thẻ, Khách hàng được giảm
-              giá thêm 5% khi mua hàng trong chương trình giảm giá 30%
+              Giảm 30% khi mua hàng tại hệ thống ELA via trong vòng 01 năm kể từ
+              ngày đạt hạng thẻ. Ngoài Chiết khấu thẻ, Khách hàng được giảm giá
+              thêm 5% khi mua hàng trong chương trình giảm giá 30%
               <br />
               Nhận quà tặng sinh nhật của khách hàng, kèm theo những chính sách
               ưu đãi dành riêng cho khách hàng VIP vào các dịp lễ đặc biệt.
               <br />
               Khách hàng sẽ được nhận thêm các ưu đãi hấp dẫn từ các đối tác của
-              IVY Moda trong các lĩnh vực: Mỹ Phẩm, Nước hoa, Trang sức, Beauty
-              - Spa, Nhà hàng, Tạp chí…
+              ELA via trong các lĩnh vực: Mỹ Phẩm, Nước hoa, Trang sức, Beauty -
+              Spa, Nhà hàng, Tạp chí…
             </div>
             <br />
             <div className="text-lg font-semibold">
@@ -201,23 +201,23 @@ const TermsPolicy = () => {
               Thẻ được áp được áp dụng cho tất cả hình thức mua hàng tại cửa
               hàng và mua hàng online, không bao gồm các đại lý;
               <br />
-              Thẻ này do IVY moda phát hành và là tài sản của IVY moda. IVY moda
-              có quyền từ chối sử dụng, tạm khóa, đình chỉ thẻ trong một số
-              trường hợp mà không cần báo trước tới khách hàng.
+              Thẻ này do ELA via phát hành và là tài sản của ELA via. ELA via có
+              quyền từ chối sử dụng, tạm khóa, đình chỉ thẻ trong một số trường
+              hợp mà không cần báo trước tới khách hàng.
               <br />
               Việc Khách Hàng truy cập hoặc thực hiện giao dịch trên Website:
-              ivymoda.com và Ứng dụng di động của IVY moda được hiểu là Khách
-              Hàng đã đọc, hiểu và đồng ý tuân thủ Chính Sách và Điều khoản sử
-              dụng thẻ thành viên (”Chính sách và Điều khoản“), kể cả các phiên
-              bản sửa đổi, bổ sung của Chính Sách và Điều khoản. Phiên bản sửa
-              đổi, bổ sung Chính Sách và Điều khoản này (nếu có) sẽ có hiệu lực
-              ngay khi được cập nhật chính thức trên Website và Ứng dụng và
-              không cần phải thông báo trước, khi Khách Hàng truy cập và thực
-              hiện giao dịch với IVY moda sau khi thay đổi Chính sách và Điều
-              Khoản mới có hiệu lực, có nghĩa là Khách Hàng chấp nhận với những
-              thay đổi đó. Một lần nữa, IVY moda lưu ý: Khách Hàng vui lòng cập
-              nhật thường xuyên hoặc đọc kỹ lại Chính sách và Điều khoản trước
-              khi thực hiện giao dịch.
+              Elavia.com và Ứng dụng di động của ELA via được hiểu là Khách Hàng
+              đã đọc, hiểu và đồng ý tuân thủ Chính Sách và Điều khoản sử dụng
+              thẻ thành viên (”Chính sách và Điều khoản“), kể cả các phiên bản
+              sửa đổi, bổ sung của Chính Sách và Điều khoản. Phiên bản sửa đổi,
+              bổ sung Chính Sách và Điều khoản này (nếu có) sẽ có hiệu lực ngay
+              khi được cập nhật chính thức trên Website và Ứng dụng và không cần
+              phải thông báo trước, khi Khách Hàng truy cập và thực hiện giao
+              dịch với ELA via sau khi thay đổi Chính sách và Điều Khoản mới có
+              hiệu lực, có nghĩa là Khách Hàng chấp nhận với những thay đổi đó.
+              Một lần nữa, ELA via lưu ý: Khách Hàng vui lòng cập nhật thường
+              xuyên hoặc đọc kỹ lại Chính sách và Điều khoản trước khi thực hiện
+              giao dịch.
             </div>
             <br />
             <div className="text-lg font-semibold">
@@ -234,7 +234,7 @@ const TermsPolicy = () => {
               <br />
               Khách Hàng có trách nhiệm đảm bảo những thông tin Khách Hàng cung
               cấp là đầy đủ và chính xác và luôn cập nhật thông tin để đảm bảo
-              tính đầy đủ và chính xác. IVY moda không chịu trách nhiệm giải
+              tính đầy đủ và chính xác. ELA via không chịu trách nhiệm giải
               quyết bất kỳ tranh chấp nào nếu thông tin Khách Hàng cung cấp
               không chính xác hoặc không được cập nhật hoặc giả mạo.
             </div>
@@ -245,25 +245,25 @@ const TermsPolicy = () => {
             <br />
             <div className="font-xs text-[#6c757d]">
               Thông Tin Khách Hàng, cũng như các thông tin trao đổi giữa Khách
-              Hàng và IVY moda, đều được lưu giữ và bảo mật bởi hệ thống của IVY
+              Hàng và ELA via, đều được lưu giữ và bảo mật bởi hệ thống của IVY
               moda, riêng thông tin thẻ thanh toán của Khách Hàng sẽ do các đối
-              tác Cổng thanh toán của IVY moda bảo mật theo tiêu chuẩn quốc tế.
+              tác Cổng thanh toán của ELA via bảo mật theo tiêu chuẩn quốc tế.
               <br />
-              IVY moda có các biện pháp thích hợp về kỹ thuật và an ninh để ngăn
+              ELA via có các biện pháp thích hợp về kỹ thuật và an ninh để ngăn
               chặn việc truy cập, sử dụng trái phép Thông Tin Khách Hàng. IVY
               moda cũng thường xuyên phối hợp với các chuyên gia bảo mật nhằm
               cập nhật những thông tin mới nhất về an ninh mạng để đảm bảo sự an
               toàn cho Thông Tin Khách Hàng khi Khách Hàng truy cập, đăng ký mở
               tài khoản, sử dụng các tính năng của Website và Ứng dụng. Khi thu
-              thập dữ liệu, IVY moda thực hiện lưu giữ và bảo mật Thông Tin
-              Khách Hàng tại hệ thống máy chủ và các Thông Tin Khách Hàng này
-              được bảo đảm an toàn bằng các hệ thống tường lửa (firewall), các
-              biện pháp kiểm soát truy cập, mã hóa dữ liệu.
+              thập dữ liệu, ELA via thực hiện lưu giữ và bảo mật Thông Tin Khách
+              Hàng tại hệ thống máy chủ và các Thông Tin Khách Hàng này được bảo
+              đảm an toàn bằng các hệ thống tường lửa (firewall), các biện pháp
+              kiểm soát truy cập, mã hóa dữ liệu.
               <br />
               Các thông tin thẻ thanh toán của Khách Hàng được các đối tác cổng
-              thanh toán của IVY moda bảo vệ theo tiêu chuẩn quốc tế. IVY moda
+              thanh toán của ELA via bảo vệ theo tiêu chuẩn quốc tế. ELA via
               không cho phép các bên thứ ba theo dõi hoặc thu thập thông tin của
-              Khách Hàng trên Website và Ứng dụng của IVY moda.
+              Khách Hàng trên Website và Ứng dụng của ELA via.
               <br />
               Đối với các tài khoản đã đóng chúng tôi vẫn lưu trữ Thông Tin Cá
               Nhân và truy cập của Khách Hàng để phục vụ cho các mục đích phòng
@@ -271,12 +271,12 @@ const TermsPolicy = () => {
               <br />
               Khách Hàng tuyệt đối không được có bất kỳ hành vi sử dụng công cụ,
               chương trình để can thiệp trái phép vào hệ thống hay làm thay đổi
-              cấu trúc dữ liệu của IVY moda, cũng như bất kỳ hành vi nào khác
+              cấu trúc dữ liệu của ELA via, cũng như bất kỳ hành vi nào khác
               nhằm phát tán, cổ vũ cho các hoạt động với mục đích can thiệp, phá
-              hoại hay xâm nhập vào dữ liệu của hệ thống IVY moda, cũng như các
+              hoại hay xâm nhập vào dữ liệu của hệ thống ELA via, cũng như các
               các hành vi mà pháp luật Việt Nam nghiêm cấm. Trong trường hợp IVY
               moda phát hiện Khách Hàng có hành vi cố tình giả mạo, gian lận,
-              phát tán các thông tin trái phép,…IVY moda có quyền chuyển Thông
+              phát tán các thông tin trái phép,…ELA via có quyền chuyển Thông
               Tin Cá Nhân của Khách Hàng cho các cơ quan có thẩm quyền để xử lý
               theo quy định pháp luật.
             </div>
@@ -286,13 +286,13 @@ const TermsPolicy = () => {
             </div>
             <br />
             <div className="font-xs text-[#6c757d]">
-              IVY moda có quyền sử dụng các thông tin Khách Hàng cung cấp, bao
+              ELA via có quyền sử dụng các thông tin Khách Hàng cung cấp, bao
               gồm nhưng không giới hạn ở Thông Tin Khách Hàng để:
               <br />
               Cung cấp các dịch vụ/tiện ích cho Khách Hàng dựa trên nhu cầu và
               các thói quen của Khách Hàng khi truy cập vào Website và Ứng dụng;
               <br />
-              Gửi các thông báo, trao đổi thông tin giữa Khách Hàng với IVY moda
+              Gửi các thông báo, trao đổi thông tin giữa Khách Hàng với ELA via
               qua Website và Ứng dụng, hoặc ngược lại;
               <br />
               Phát hiện, ngăn chặn các hoạt động giả mạo, phá hoại tài khoản của
@@ -310,32 +310,32 @@ const TermsPolicy = () => {
             <div className="font-xs text-[#6c757d]">
               Khách Hàng có trách nhiệm bảo vệ thông tin tài khoản của mình và
               không cung cấp bất kỳ thông tin nào liên quan đến tài khoản và mật
-              khẩu truy cập trên Website và Ứng dụng của IVY moda trên các
+              khẩu truy cập trên Website và Ứng dụng của ELA via trên các
               website khác ngoại trừ khi đăng nhập vào địa chỉ chính thức của
-              IVY moda tại ivymoda.com và Ứng dụng di dộng IVY moda;
+              ELA via tại Elavia.com và Ứng dụng di dộng ELA via;
               <br />
               Cung cấp các dịch vụ/tiện ích cho Khách Hàng dựa trên nhu cầu và
               các thói quen của Khách Hàng khi truy cập vào Website và Ứng dụng;
               <br />
-              Ngoài các trường hợp nêu trên, IVY moda sẽ có thông báo cụ thể cho
+              Ngoài các trường hợp nêu trên, ELA via sẽ có thông báo cụ thể cho
               Khách Hàng khi phải tiết lộ Thông Tin Khách Hàng cho một bên thứ
-              ba. Trong trường hợp này, IVY moda cam kết sẽ chỉ tiết lộ Thông
-              Tin Khách Hàng khi được sự đồng ý của Khách Hàng;
+              ba. Trong trường hợp này, ELA via cam kết sẽ chỉ tiết lộ Thông Tin
+              Khách Hàng khi được sự đồng ý của Khách Hàng;
               <br />
-              IVY moda có thể chia sẻ Thông Tin Khách Hàng cho các mục đích sau:
+              ELA via có thể chia sẻ Thông Tin Khách Hàng cho các mục đích sau:
               <br />
-              - Nghiên cứu thị trường và các báo cáo phân tích: IVY moda có thể
+              - Nghiên cứu thị trường và các báo cáo phân tích: ELA via có thể
               dùng Thông Tin Khách Hàng để nghiên cứu thị trường, tổng hợp, phân
               tích thông tin chung của Khách Hàng (ví dụ: độ tuổi trung bình,
               khu vực địa lý…), thông tin chi tiết sẽ được ẩn và chỉ được dùng
-              để phục vụ công việc thống kê. Trong trường hợp IVY moda tiến hành
+              để phục vụ công việc thống kê. Trong trường hợp ELA via tiến hành
               khảo sát cần sự tham gia của Khách Hàng, bất kỳ câu trả lời cho
-              khảo sát hoặc thăm dò dư luận mà Khách Hàng cung cấp cho IVY moda
+              khảo sát hoặc thăm dò dư luận mà Khách Hàng cung cấp cho ELA via
               sẽ không được chuyển cho bất kỳ bên thứ ba nào;
               <br />- Trao đổi Thông Tin Khách Hàng với các bên thứ ba là đối
-              tác, đại lý của IVY moda: IVY moda có thể chuyển Thông Tin Khách
+              tác, đại lý của ELA via: ELA via có thể chuyển Thông Tin Khách
               Hàng cho các đại lý và nhà thầu phụ để làm phân tích dữ liệu, tiếp
-              thị và hỗ trợ dịch vụ khách hàng. IVY moda cũng có thể trao đổi
+              thị và hỗ trợ dịch vụ khách hàng. ELA via cũng có thể trao đổi
               Thông Tin Khách Hàng với bên thứ ba cho mục đích chống gian lận và
               giảm rủi ro tín dụng.
             </div>
@@ -343,10 +343,10 @@ const TermsPolicy = () => {
             <div className="text-base font-semibold">4.2.6. Sử dụng Cookie</div>
             <br />
             <div className="font-xs text-[#6c757d]">
-              IVY moda cung cấp các tập tin cookie hoặc các công nghệ tương tự,
+              ELA via cung cấp các tập tin cookie hoặc các công nghệ tương tự,
               nhằm thu thập các thông tin như: lịch sử truy cập, các lựa chọn
               của Khách Hàng khi truy cập và sử dụng tính năng của Website và
-              Ứng dụng... nhằm tăng trải nghiệm bảo mật và giúp IVY moda hiểu rõ
+              Ứng dụng... nhằm tăng trải nghiệm bảo mật và giúp ELA via hiểu rõ
               nhu cầu, sở thích của Khách Hàng để có thể cung cấp dịch vụ tốt
               hơn.
             </div>
@@ -357,8 +357,7 @@ const TermsPolicy = () => {
             <br />
             <div className="font-xs text-[#6c757d]">
               Bất kỳ khi nào Khách Hàng cần hỗ trợ, hãy gọi đến số hotline của
-              IVY moda: 090 589 8683 hoặc gửi email đến địa chỉ:
-              cskh@ivy.com.vn.
+              ELA via: 090 589 8683 hoặc gửi email đến địa chỉ: cskh@ivy.com.vn.
             </div>
           </aside>
         </div>

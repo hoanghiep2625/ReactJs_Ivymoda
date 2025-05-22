@@ -1,21 +1,21 @@
-# 🛍️ IvyModa – React Frontend
+# 🛍️ Elavia – React Frontend
 
-This is the **ReactJS** frontend for the [IvyModa Clothing Store](https://react-js-ivymoda.vercel.app).  
+This is the **ReactJS** frontend for the [Elavia Clothing Store](https://react-js-Elavia.vercel.app).  
 The frontend is built using **React**, **TypeScript**. It interacts with the **Node.js API** backend using **JWT** authentication and **RESTful API** endpoints.
 
 ---
 
 ## 🔗 Live Projects
 
-👉 Frontend Website: [https://react-js-ivymoda.vercel.app](https://react-js-ivymoda.vercel.app)  
-👉 Backend API: [https://nodejs-ivymoda.fly.dev](https://nodejs-ivymoda.fly.dev)
+👉 Frontend Website: [https://react-js-Elavia.vercel.app](https://react-js-Elavia.vercel.app)  
+👉 Backend API: [https://nodejs-Elavia.fly.dev](https://nodejs-Elavia.fly.dev)
 
 ---
 
 ## 📦 GitHub Repositories
 
-- 👉 Frontend Repo: [github.com/hoanghiep2625/ReactJs_Ivymoda](https://github.com/hoanghiep2625/ReactJs_Ivymoda)
-- 👉 Backend Repo: [github.com/hoanghiep2625/NodeJs_Ivymoda](https://github.com/hoanghiep2625/NodeJs_Ivymoda)
+- 👉 Frontend Repo: [github.com/hoanghiep2625/ReactJs_Elavia](https://github.com/hoanghiep2625/ReactJs_Elavia)
+- 👉 Backend Repo: [github.com/hoanghiep2625/NodeJs_Elavia](https://github.com/hoanghiep2625/NodeJs_Elavia)
 
 ---
 

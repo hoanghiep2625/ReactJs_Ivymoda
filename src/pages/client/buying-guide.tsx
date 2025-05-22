@@ -30,7 +30,7 @@ const BuyingGuide = () => {
                     className="leading-[15px] text-[14px] font-semibold text-gray-600 block hover:text-black"
                     href="#"
                   >
-                    Về IVY moda
+                    Về ELA via
                   </a>
                   <br />
                   <a
@@ -77,8 +77,8 @@ const BuyingGuide = () => {
                   </div>
                   <br />
                   <div className="text-lg font-semibold">
-                    Mua sắm tại IVY moda thật dễ dàng. Quý khách chỉ cần làm
-                    theo các bước sau:
+                    Mua sắm tại ELA via thật dễ dàng. Quý khách chỉ cần làm theo
+                    các bước sau:
                   </div>
                   <br />
                   <div className="space-y-1.5 ml-[24px] text-[#000000] text-[16px]">
@@ -112,7 +112,7 @@ const BuyingGuide = () => {
                       xác nhận đơn hàng.
                     </div>
                     <div className="font-normal text-base">
-                      IVY moda sẽ gửi Thông tin xác nhận đặt hàng thành công qua
+                      ELA via sẽ gửi Thông tin xác nhận đặt hàng thành công qua
                       Tin nhắn vào số điện thoại đặt hàng và Email qua địa chỉ
                       email của quý khách.
                     </div>
@@ -122,8 +122,8 @@ const BuyingGuide = () => {
                       đã đặt thì:
                     </div>
                     <div className="font-normal text-base">
-                      TH1: Nếu đơn hàng chưa được IVY moda xử lý, bạn chỉ cần
-                      làm các bước sau:
+                      TH1: Nếu đơn hàng chưa được ELA via xử lý, bạn chỉ cần làm
+                      các bước sau:
                     </div>
                     <div className="font-normal text-base">
                       Bước 1: Vào đường link:{" "}
@@ -141,11 +141,11 @@ const BuyingGuide = () => {
                       Bước 4: Đặt lại đơn hàng mới
                     </div>
                     <div className="font-semibold text-base">
-                      TH2: Nếu đơn hàng đã được IVY moda xử lý thì bạn liên hệ
+                      TH2: Nếu đơn hàng đã được ELA via xử lý thì bạn liên hệ
                       đến: Hotline: 02466623434 - nhánh 2 để được hỗ trợ
                     </div>
                     <div className="font-normal text-base">
-                      IVY moda rất vui vì được quý khách tin yêu!
+                      ELA via rất vui vì được quý khách tin yêu!
                     </div>
                   </div>
                 </div>

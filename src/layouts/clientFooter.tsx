@@ -27,7 +27,7 @@ const Footer = () => {
             <img
               src="/images/logo.png"
               alt="Logo"
-              className="w-28 h-auto mr-4"
+              className="w-20 h-auto mr-4"
             />
             <img src="/images/dmca.png" alt="DMCA" className="w-15 h-5 mr-4" />
             <img
@@ -57,7 +57,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr_1fr] gap-4">
           <div>
             <p
-              className="font-semibold lg:text-2xl md:text-[16px] pb-2 cursor-pointer flex items-center"
+              className="font-semibold lg:text-xl md:text-[16px] pb-2 cursor-pointer flex items-center"
               onClick={() => toggleDropdown("about")}
             >
               Giới thiệu
@@ -84,7 +84,7 @@ const Footer = () => {
                   className="font-[300] text-sm hover:text-orange-600 transition-all duration-300 cursor-pointer"
                   href="#"
                 >
-                  Về IVY moda
+                  Về ELA via
                 </a>
               </p>
               <p className="py-2">
@@ -109,7 +109,7 @@ const Footer = () => {
           {/* Phần Dịch vụ khách hàng */}
           <div>
             <p
-              className="font-semibold lg:text-2xl md:text-[16px] pb-2 cursor-pointer flex items-center"
+              className="font-semibold lg:text-xl md:text-[16px] pb-2 cursor-pointer flex items-center"
               onClick={() => toggleDropdown("services")}
             >
               Dịch vụ khách hàng
@@ -201,7 +201,7 @@ const Footer = () => {
           {/* Phần Liên hệ */}
           <div>
             <p
-              className="font-semibold lg:text-2xl md:text-[16px] pb-2 cursor-pointer flex items-center"
+              className="font-semibold lg:text-xl md:text-[16px] pb-2 cursor-pointer flex items-center"
               onClick={() => toggleDropdown("contact")}
             >
               Liên hệ
@@ -270,8 +270,8 @@ const Footer = () => {
         {/* Cột 3: Nhận thông tin và Download App */}
         <div>
           <div className="border-[4px] border-[#9999]-500 p-4 rounded-tl-[45px] rounded-br-[45px]">
-            <p className="font-[600] lg:text-xl md:text-[16px] pt-2 pr-4 pb-4">
-              Nhận thông tin các chương trình của IVY moda
+            <p className="font-[600] lg:text-lg md:text-[16px] pt-2 pr-4 pb-4">
+              Nhận thông tin các chương trình của ELA via
             </p>
             <div className="flex pb-4 w-full">
               <div className="w-full border-b flex items-center">
@@ -287,7 +287,7 @@ const Footer = () => {
               </div>
             </div>
           </div>
-          <div className="lg:text-2xl md:text-[16px] font-semibold py-4">
+          <div className="lg:text-xl md:text-[16px] font-semibold py-4">
             Download App
           </div>
           <img
@@ -306,7 +306,7 @@ const Footer = () => {
       {/* Đường phân cách và bản quyền */}
       <hr />
       <div className="flex justify-center items-center h-16">
-        <p>©IVYmoda All rights reserved - Tạ Hoàng Hiệp</p>
+        <p>©Elavia All rights reserved - Tạ Hoàng Hiệp</p>
       </div>
     </footer>
   );

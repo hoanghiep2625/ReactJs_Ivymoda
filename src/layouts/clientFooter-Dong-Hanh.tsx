@@ -5,10 +5,10 @@ const ClientFooterDongHanh = () => {
         <img src="/images/huong_dan_mua_hang2.jpg" alt="Hướng dẫn mua hàng 2" />
       </div>
       <div className="p-8">
-        <div className="text-3xl font-semibold">Đồng hành cùng IVY moda</div>
+        <div className="text-3xl font-semibold">Đồng hành cùng Ela Via</div>
         <br />
         <div className="text-[16px] text-[#6C6D70]">
-          Cảm ơn bạn đã yêu thích sản phẩm và đồng hành cùng IVY moda. Mọi thắc
+          Cảm ơn bạn đã yêu thích sản phẩm và đồng hành cùng Ela Via. Mọi thắc
           mắc liên quan đến chính sách thanh toán, vui lòng liên hệ theo số
           thông tin bên dưới
         </div>

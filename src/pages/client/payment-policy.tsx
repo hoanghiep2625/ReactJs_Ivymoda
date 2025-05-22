@@ -25,7 +25,7 @@ const PaymentPolicy = () => {
                     className="leading-[15px] text-[14px] font-semibold text-gray-600 block hover:text-black"
                     href=""
                   >
-                    Về IVY moda
+                    Về ELA via
                   </a>
                   <br />
                   <a
@@ -72,7 +72,7 @@ const PaymentPolicy = () => {
                   </div>
                   <br />
                   <div className="text-[20px] font-bold mt-0 mr-0 mb-[10px] ml-0 mx-auto">
-                    Có 2 hình thức thanh toán khi mua hàng online tại IVY moda
+                    Có 2 hình thức thanh toán khi mua hàng online tại ELA via
                   </div>
                   <br />
                   <div className="space-y-1 text-[16px]">

@@ -172,7 +172,7 @@ const Login = () => {
             </div>
             <div className="flex flex-col items-center px-10">
               <p className="font-semibold text-xl py-4">
-                Khách hàng mới của IVY moda
+                Khách hàng mới của ELA via
               </p>
               <p className="text-gray-500 text-center text-[14px] mb-2">
                 Nếu bạn chưa có tài khoản, hãy đăng ký ngay để trải nghiệm mua

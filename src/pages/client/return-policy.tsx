@@ -22,7 +22,7 @@ const ReturnPolicy = () => {
                     className="leading-[15px] text-[14px] font-semibold text-gray-600 block hover:text-black"
                     href=""
                   >
-                    Về IVY moda
+                    Về ELA via
                   </a>
                   <br />
                   <a
@@ -84,7 +84,7 @@ const ReturnPolicy = () => {
                       Áp dụng tại tất cả các cửa hàng trên toàn hệ thống của IVY
                       moda và{" "}
                       <span className="font-">
-                        Hệ thống Kho hàng Online của IVY moda.
+                        Hệ thống Kho hàng Online của ELA via.
                       </span>
                     </div>
                     <br />
@@ -111,7 +111,7 @@ const ReturnPolicy = () => {
                     </div>
                     <br />
                     <div>
-                      - IVY moda chỉ sử dụng “Biên lai đặt cọc” để hoàn lại tiền
+                      - ELA via chỉ sử dụng “Biên lai đặt cọc” để hoàn lại tiền
                       thừa sau khi đổi và giá trị hàng trả cho khách, không hoàn
                       tiền mặt trong mọi trường hợp.
                     </div>

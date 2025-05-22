@@ -50,9 +50,7 @@ const Home = () => {
             NEW ARRIVAL
           </p>
           <div className="flex justify-center pb-6 md:pb-8 pt-2 md:pt-4">
-            <p className="pr-3 md:pr-6 text-lg md:text-xl underline">
-              IVY moda
-            </p>
+            <p className="pr-3 md:pr-6 text-lg md:text-xl underline">ELA via</p>
             <p className="pl-3 md:pl-6 text-lg md:text-xl text-gray-500">
               IVY men
             </p>
@@ -73,11 +71,9 @@ const Home = () => {
             FALL - WINTER COLLECTION 2024
           </p>
           <div className="flex justify-center pb-6 md:pb-8">
-            <p className="pr-3 md:pr-6 text-lg md:text-xl underline">
-              IVY moda
-            </p>
+            <p className="pr-3 md:pr-6 text-lg md:text-xl underline">ELA via</p>
             <p className="pl-3 md:pl-6 text-lg md:text-xl text-gray-500">
-              IVY men
+              ELA via
             </p>
           </div>
 
