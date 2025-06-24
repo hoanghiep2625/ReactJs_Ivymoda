@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/auth.context"; // Import useAuth
+import { STATUS_CODES } from "http";
 
 const Login = () => {
   const [formData, setFormData] = useState<LoginType>({
@@ -51,8 +52,23 @@ const Login = () => {
     },
     onError: (err) => {
       if (axios.isAxiosError(err) && err.response) {
-        const errorData = err.response.data as { errors?: string[] };
-        const errorMessage = errorData.errors?.[0] || "Đăng nhập thất bại!";
+        const status = err.response.status;
+        const errorData = err.response.data as {
+          errors?: string[];
+          message?: string;
+          email?: string;
+        };
+        const errorMessage = errorData?.message || "Đăng nhập thất bại!";
+
+        if (status === 402) {
+          const email = errorData.email || formData.email; // fallback nếu BE không trả email
+          localStorage.setItem("verify_email", email); // Lưu tạm
+          localStorage.setItem("temp_auth", JSON.stringify(formData));
+          navigate("/verify-account", { state: { email } });
+          toast.info("Tài khoản chưa xác thực. Vui lòng kiểm tra email.");
+          return;
+        }
+        console.log("Login error:", err.response);
         toast.error(errorMessage);
 
         setErrors({
@@ -102,7 +118,7 @@ const Login = () => {
             <form onSubmit={handleSubmit} id="loginForm">
               <div className="flex flex-col items-center">
                 <p className="font-semibold text-xl py-4">
-                  Bạn đã có tài khoản IVY
+                  Bạn đã có tài khoản Elavia
                 </p>
 
                 <p className="text-[14px] text-gray-500 mb-5 text-center">
