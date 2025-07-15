@@ -11,13 +11,18 @@ import CheckLogin from "./components/checkLogin"; //Nếu chưa đăng nhập th
 import Orders from "./pages/client/orders";
 import Address from "./pages/client/address";
 import Detail_order from "./pages/client/detailOrder";
-import FavoriteProducts from "./pages/client/favorite_products";
+import WishProducts from "./pages/client/wishProducts";
 import DetailUser from "./pages/client/detailUser";
-import TermsPolicy from "./pages/client/terms-policy";
-import BuyingGuide from "./pages/client/buying-guide";
-import PaymentPolicy from "./pages/client/payment-policy";
-import ReturnPolicy from "./pages/client/return-policy";
+import TermsPolicy from "./pages/client/termsPolicy";
+import BuyingGuide from "./pages/client/buyingGuide";
+import PaymentPolicy from "./pages/client/paymentPolicy";
+import ReturnPolicy from "./pages/client/returnPolicy";
 import VerifyAccount from "./pages/client/verifyAccount";
+import ViewedProducts from "./pages/client/viewedProduct";
+import Ordersuccess from "./pages/client/orderSuccess";
+import OrderFollow from "./pages/client/orderFollow";
+import LoginHistory from "./pages/client/loginHistory";
+import SearchProduct from "./pages/client/searchProduct";
 
 function App() {
   const DetailProductWrapper = () => {
@@ -31,6 +36,7 @@ function App() {
     { path: "/", element: <Home /> },
     { path: "/login", element: <Login /> },
     { path: "/register", element: <Register /> },
+    { path: "/search-product", element: <SearchProduct /> },
     { path: "/verify-account", element: <VerifyAccount /> },
     { path: "/terms-policy", element: <TermsPolicy /> },
     { path: "/buying-guide", element: <BuyingGuide /> },
@@ -42,14 +48,24 @@ function App() {
       path: "/order-details/:id",
       element: <CheckLogin element={<Detail_order />} />,
     },
+    {
+      path: "/loginHistory",
+      element: <CheckLogin element={<LoginHistory />} />,
+    },
     { path: "/user-details", element: <CheckLogin element={<DetailUser />} /> },
     { path: "/cart", element: <CheckLogin element={<Cart />} /> },
     { path: "/dathang", element: <CheckLogin element={<Dathang />} /> },
     { path: "/address", element: <CheckLogin element={<Address />} /> },
     {
-      path: "/favorite_products",
-      element: <CheckLogin element={<FavoriteProducts />} />,
+      path: "/wish-products",
+      element: <CheckLogin element={<WishProducts />} />,
     },
+    {
+      path: "/viewed-products",
+      element: <CheckLogin element={<ViewedProducts />} />,
+    },
+    { path: "/ordersuccess", element: <Ordersuccess /> },
+    { path: "/order-follow/:id", element: <OrderFollow /> },
   ]);
   return routes;
 }

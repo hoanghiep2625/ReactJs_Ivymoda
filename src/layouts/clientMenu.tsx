@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import useCartQuantity from "../hooks/useCartQuantity";
 import { getList } from "../api/provider";
 import Loading from "../components/loading";
+import { Phone, User, ShoppingBag } from "lucide-react";
 
 // Định nghĩa kiểu dữ liệu cho danh mục
 interface Category {
@@ -62,7 +63,16 @@ const MenuClient = () => {
       toast.error("Đăng xuất thất bại!");
     },
   });
+  const [searchTerm, setSearchTerm] = useState("");
 
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchTerm.trim() !== "") {
+      navigate(
+        `/search-product?keyword=${encodeURIComponent(searchTerm.trim())}`
+      );
+      setSearchTerm(""); // clear ô input
+    }
+  };
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -216,15 +226,35 @@ const MenuClient = () => {
         <div className="flex items-center justify-end space-x-6">
           <div className="hidden md:flex relative h-9 border items-center w-full max-w-xs">
             <div className="flex px-2 gap-3 items-center w-full">
-              <img
-                src="/images/magnifying-glass.png"
-                alt="Search"
-                className="w-4 h-4 flex-shrink-0"
-              />
+              <button
+                type="button"
+                onClick={() => {
+                  if (searchTerm.trim() !== "") {
+                    navigate(
+                      `/search-product?keyword=${encodeURIComponent(
+                        searchTerm.trim()
+                      )}`
+                    );
+                    setSearchTerm("");
+                  }
+                }}
+                className="focus:outline-none"
+                tabIndex={-1}
+                aria-label="Tìm kiếm"
+              >
+                <img
+                  src="/images/magnifying-glass.png"
+                  alt="Search"
+                  className="w-4 h-4 flex-shrink-0 cursor-pointer"
+                />
+              </button>
               <input
                 type="text"
                 name="searchname"
                 id="searchname"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={handleSearch}
                 placeholder="TÌM KIẾM SẢN PHẨM"
                 className="text-xs p-0 outline-none border-0 focus:outline-none focus:ring-0 w-full"
               />
@@ -233,21 +263,17 @@ const MenuClient = () => {
 
           <div className="hidden md:block">
             <Link to="/support">
-              <img
-                src="/images/earphones.png"
-                alt="Hỗ trợ"
-                className="w-5 h-auto"
-              />
+              <Phone className="w-5 h-5 text-gray-800" strokeWidth={1} />
             </Link>
           </div>
 
           <div className="hidden md:block relative user-menu-container">
-            <img
-              src="/images/user.png"
-              alt="Người dùng"
-              className="w-5 h-auto cursor-pointer"
+            <User
+              className="w-5 h-5 text-gray-800 cursor-pointer"
+              strokeWidth={1}
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
             />
+
             {isUserMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white border shadow-lg z-50 py-2">
                 {isAuthenticated ? (
@@ -258,19 +284,17 @@ const MenuClient = () => {
                     >
                       Thông tin tài khoản
                     </Link>
-                    {user.role === "3" && (
-                      <Link
-                        to="/admin"
-                        className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
-                      >
-                        Quản trị admin
-                      </Link>
-                    )}
                     <Link
                       to="/orders"
                       className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
                     >
                       Đơn hàng của tôi
+                    </Link>
+                    <Link
+                      to="/loginHistory"
+                      className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
+                    >
+                      Lịch sử đăng nhập
                     </Link>
                     <Link
                       to="/viewed-products"
@@ -279,7 +303,7 @@ const MenuClient = () => {
                       Sản phẩm đã xem
                     </Link>
                     <Link
-                      to="/favorites"
+                      to="/wish-products"
                       className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
                     >
                       Sản phẩm yêu thích
@@ -310,14 +334,10 @@ const MenuClient = () => {
 
           <div className="relative flex items-center justify-center cursor-pointer">
             <Link to="/cart">
-              <img
-                src="/images/shopping-bag.png"
-                alt="Giỏ hàng"
-                className="w-7 h-auto"
-              />
+              <ShoppingBag className="w-5 h-5 text-gray-800" strokeWidth={1} />
             </Link>
             {quantity > 0 && (
-              <span className="absolute -top-[-15px] -right-[5px] bg-black text-white text-[10px] w-3 h-3 rounded-full flex items-center justify-center">
+              <span className="absolute -top-[-10px] -right-[5px] bg-black text-white text-[10px] w-3 h-3 rounded-full flex items-center justify-center">
                 {quantity}
               </span>
             )}

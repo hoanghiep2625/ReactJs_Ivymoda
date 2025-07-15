@@ -1,18 +1,23 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import MenuInfo from "../../components/menuInfo";
 import { useQuery } from "@tanstack/react-query";
 import { getById } from "../../api/provider";
 import Loading from "../../components/loading";
 import ClientLayout from "../../layouts/clientLayout";
+import { useAddToCart } from "../../hooks/useAddToCart";
+import { useAuth } from "../../context/auth.context";
+import { toast } from "react-toastify";
 
 const Detail_order = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { auth } = useAuth();
+  const addToCartMutation = useAddToCart();
   const { data, isLoading } = useQuery({
     queryKey: ["orders", id],
     queryFn: () => getById({ namespace: "orders", id: id }),
   });
-  // console.log("🚀 ~ constDetail_order= ~ data:", data);
   if (isLoading) {
     return <Loading />;
   }
@@ -23,29 +28,52 @@ const Detail_order = () => {
       </div>
     );
   }
-  return (
-    <>
-      <ClientLayout>
-        <article className="mt-[98px]">
-          <div className="flex gap-4 my-4">
-            <div className="text-sm">
-              <a href="?action=home">Trang chủ</a>
-            </div>
-            <div className="text-sm">-</div>
-            <div className="text-sm">Chi tiết đơn hàng</div>
-          </div>
-        </article>
-        <hr className="" />
-        <div className="grid grid-cols-[0.6fr_2fr] pt-8 py-1  ">
-          {/* Sidebar Menu */}
-          <MenuInfo />
 
-          {/* Main Content: Orders Table */}
-          <div className="  p-4">
+  const handleBuyAgain = (item: any) => {
+    if (!auth.user?.id) {
+      toast.error("Bạn cần đăng nhập để mua lại sản phẩm!");
+      return;
+    }
+    addToCartMutation.mutate({
+      productVariantId: item.productVariantId?._id,
+      size: item.size,
+      quantity: 1,
+      userId: auth.user.id,
+    });
+  };
+
+  return (
+    <ClientLayout>
+      <article className="mt-[98px]">
+        <div className="flex gap-4 my-4">
+          <div className="text-sm">
+            <a href="/">Trang chủ</a>
+          </div>
+          <div className="text-sm">-</div>
+          <div className="text-sm">
+            <div className="text-sm flex gap-4">
+              <div>Chi tiết đơn hàng</div>
+            </div>
+          </div>
+          <div className="text-sm">-</div>
+          <div className="text-sm">
+            <div className="text-sm flex gap-4">
+              <div>{data.orderId}</div>
+            </div>
+          </div>
+        </div>
+        <hr className="border-t border-gray-300 my-4" />
+
+        <div className="grid grid-cols-[0.7fr_2.5fr] gap-8">
+          {/* Menu */}
+          <div className="p-4 pl-0 font-bold rounded-tl-[40px] rounded-br-[40px] border-gray-700 h-auto mt-2">
+            <MenuInfo />
+          </div>
+          <div className="p-4 pl-0">
             <div className="flex justify-between mb-6">
               <h2 className="text-2xl font-semibold">
-                CHI TIẾT ĐƠN HÀNG{" "}
-                <span className="text-red-600">{data.orderId}</span>
+                Chi tiết đơn hàng
+                <span className="text-red-600"> {data.orderId}</span>
               </h2>
               <button className="text-sm text-red-500 hover:underline">
                 {data.status}
@@ -60,8 +88,12 @@ const Detail_order = () => {
                     <div className="flex-1">
                       <div className="flex gap-4">
                         <img
-                          src={item.productVariantId.images.main.url}
-                          alt="ddd"
+                          src={
+                            item.productVariantId?.images?.main?.url
+                              ? item.productVariantId.images.main.url
+                              : "https://via.placeholder.com/150x215?text=No+Image"
+                          }
+                          alt={item.productName}
                           className="w-[150px] h-[215px] object-cover"
                         />
                         <div className="flex flex-col justify-between">
@@ -75,7 +107,10 @@ const Detail_order = () => {
                               </div>
                             </div>
                             <p className="text-sm text-gray-600 py-0.5">
-                              Màu sắc: {item.productVariantId.color.colorName}
+                              Màu sắc:{" "}
+                              {item.productVariantId?.color?.colorName ||
+                                item.color ||
+                                "Không có"}
                             </p>
                             <p className="text-sm text-gray-600 py-0.5">
                               Size: {item.size}
@@ -84,10 +119,16 @@ const Detail_order = () => {
                               Số lượng: {item.quantity}
                             </p>
                             <p className="text-sm text-gray-600 py-0.5">
-                              SKU: {item.productVariantId.sku}
+                              SKU:{" "}
+                              {item.productVariantId?.sku ||
+                                item.sku ||
+                                "Không có"}
                             </p>
                           </div>
-                          <button className="w-fit mt-2 px-4 py-1 border border-black rounded-md hover:bg-black hover:text-white transition">
+                          <button
+                            onClick={() => handleBuyAgain(item)}
+                            className="w-fit mt-2 px-4 py-1 border border-black rounded-tl-[8px] rounded-bl-none rounded-tr-none rounded-br-[8px]  hover:bg-black hover:text-white transition" 
+                          >
                             MUA LẠI
                           </button>
                         </div>
@@ -118,17 +159,21 @@ const Detail_order = () => {
                   <div className="flex justify-between">
                     <span>Tạm tính</span>
                     <span className="font-medium">
-                      {data.totalAmount.toLocaleString("vi-VN")} đ
+                      {data.totalPrice.toLocaleString("vi-VN")} đ
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Phí vận chuyển</span>
-                    <span className="font-medium">38.000 đ</span>
+                    <span className="font-medium">{data.shippingFee.toLocaleString("vi-VN")} đ</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Giảm giá</span>
+                    <span className="font-medium">{data.discountAmount.toLocaleString("vi-VN")} đ</span>
                   </div>
                   <div className="flex justify-between font-semibold pt-3 border-t border-gray-300 mt-2 text-base">
                     <span>Tổng tiền</span>
                     <span>
-                      {(data.totalAmount + 38000).toLocaleString("vi-VN")} đ
+                      {data.finalAmount.toLocaleString("vi-VN")} đ
                     </span>
                   </div>
                 </div>
@@ -149,24 +194,27 @@ const Detail_order = () => {
 
                 <div>
                   <h4 className="font-semibold border-t pt-3 mb-1">Địa chỉ</h4>
-                  <p className="py-1 text-gray-700">{data.user.name}</p>
-                  <p className="py-1 text-gray-700">{data.user.address}</p>
+                  <p className="py-1 text-gray-700">{data.receiver.name}</p>
+                  <p className="py-1 text-gray-700">{data.receiver.address}, {data.receiver.communeName}, {data.receiver.districtName}, {data.receiver.cityName} </p>
                   <p className="py-1 text-gray-700">
-                    Điện thoại: {data.user.phone}
+                    Điện thoại: {data.receiver.phone}
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="mt-8">
-              <button className="bg-black text-white px-6 py-2 rounded-full hover:opacity-90 transition">
+              <button
+                className="bg-black text-white px-6 py-2 rounded-tl-[8px] rounded-bl-none rounded-tr-none rounded-br-[8px] hover:opacity-90 transition"
+                onClick={() => navigate(`/order-follow/${data._id}`)}
+              >
                 THEO DÕI ĐƠN HÀNG
               </button>
             </div>
           </div>
         </div>
-      </ClientLayout>
-    </>
+      </article>
+    </ClientLayout>
   );
 };
 
