@@ -20,4 +20,4 @@ jobs:
 
       - name: Deploy to VPS
         run: |
-            ssh -o StrictHostKeyChecking=no root@14.225.198.220 'cd /root/Elavia/Client && git pull && npm install && npm run build && pm2 restart Client-Elavia'
+            ssh -o StrictHostKeyChecking=no root@14.225.198.220 'cd /root/Elavia/Client && git reset --hard && git clean -fd && git pull && npm install && npm run build && pm2 restart Client-Elavia'
