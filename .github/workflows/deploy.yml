@@ -21,40 +21,40 @@ jobs:
       - name: Deploy to VPS
         run: |
           ssh -o StrictHostKeyChecking=no root@14.225.198.220 '
-            set -e
+          set -e
 
-            # Clone nếu repo chưa có
-            if [ ! -d /root/Elavia/Client/.git ]; then
-              mkdir -p /root/Elavia
-              cd /root/Elavia
-              git clone https://github.com/hoanghiep2625/Elavia-Client.git Client
-            fi
+          # Clone nếu repo chưa tồn tại
+          if [ ! -d /root/Elavia/Client/.git ]; then
+            mkdir -p /root/Elavia
+            cd /root/Elavia
+            git clone https://github.com/hoanghiep2625/Elavia-Client.git Client
+          fi
 
-            cd /root/Elavia/Client
+          cd /root/Elavia/Client
 
-            # Đặt lại remote cho chắc chắn (đổi URL repo nếu khác)
-            git remote set-url origin https://github.com/hoanghiep2625/Elavia-Client.git
+          # 1) HỦY MERGE DỞ + DỌN RÁC
+          git merge --abort || true
+          git reset --hard
+          git clean -fd
 
-            # Lấy dữ liệu mới nhất, không merge
-            git fetch --all --prune
+          # 2) ĐỒNG BỘ REMOTE & LẤY NHÁNH MỚI NHẤT
+          git remote set-url origin https://github.com/hoanghiep2625/Elavia-Client.git
+          git fetch --all --prune
 
-            # Đảm bảo đứng trên đúng nhánh
-            git checkout master
+          # 3) NHÁNH ĐÚNG GIỜ LÀ "main" (vì origin/master đã bị xóa)
+          git checkout main || git checkout -b main
+          git reset --hard origin/main
+          git clean -fd
 
-            # Ép local = remote, tránh conflict .DS_Store, v.v.
-            git reset --hard origin/master
-            git clean -fd
+          # 4) CÀI & BUILD
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+          npm run build
 
-            # Cài deps & build (dùng npm ci nếu có lockfile để reproducible)
-            if [ -f package-lock.json ]; then
-              npm ci
-            else
-              npm install
-            fi
-
-            npm run build
-
-            # Restart PM2
-            pm2 restart Client-Elavia --update-env || pm2 start "npm run start" --name Client-Elavia
-            pm2 save
+          # 5) KHỞI ĐỘNG LẠI PM2
+          pm2 restart Client-Elavia --update-env || pm2 start "npm run start" --name Client-Elavia
+          pm2 save
           '

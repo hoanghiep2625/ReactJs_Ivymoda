@@ -142,3 +142,5 @@ dist
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/nodenode_modules/
+.DS_Store
+**/.DS_Store
