@@ -5,25 +5,40 @@ import { useState } from "react";
 import Loading from "../../components/loading";
 import MenuInfo from "../../components/menuInfo";
 import ClientLayout from "../../layouts/clientLayout";
-
+import axiosInstance from "../../services/axiosInstance";
+import { ref } from "process";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 const Orders = () => {
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
   });
-  const [statusFilter, setStatusFilter] = useState("Tất cả");
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState("Tất cả");
+  const [shippingStatusFilter, setShippingStatusFilter] = useState("Tất cả");
+  const userId = localStorage.getItem("user_id");
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["orders", pagination.current, pagination.pageSize, statusFilter],
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: [
+      "orders",
+      pagination.current,
+      pagination.pageSize,
+      paymentStatusFilter,
+      shippingStatusFilter,
+      userId,
+    ],
     queryFn: async () => {
-      const params = {
-        namespace: `orders?_page=${pagination.current}&_limit=${pagination.pageSize}`,
-      };
-      if (statusFilter !== "Tất cả") {
-        params.namespace += `&status=${encodeURIComponent(statusFilter)}`;
+      let url = `orders?_page=${pagination.current}&_limit=${pagination.pageSize}`;
+      if (paymentStatusFilter !== "Tất cả") {
+        url += `&status=${encodeURIComponent(paymentStatusFilter)}`;
       }
-      const response = await getList(params);
-      console.log("API Response:", response); // Debug
+      if (shippingStatusFilter !== "Tất cả") {
+        url += `&status=${encodeURIComponent(shippingStatusFilter)}`;
+      }
+      if (userId) {
+        url += `&_userId=${userId}`;
+      }
+      const response = await getList({ namespace: url });
       return response;
     },
   });
@@ -44,16 +59,32 @@ const Orders = () => {
     setPagination({ current: page, pageSize });
   };
   window.scrollTo({ top: 0, behavior: "smooth" });
-  const statusOptions = [
+  const paymentStatusOptions = [
+    "Tất cả",
+    "Chờ xác nhận",
+    "Chờ thanh toán",
+    "Đã thanh toán",
+    "Thanh toán khi nhận hàng",
+    "Huỷ do quá thời gian thanh toán",
+    "Giao dịch bị từ chối do nhà phát hành",
+    "Người mua huỷ",
+    "Người bán huỷ",
+  ];
+
+  const shippingStatusOptions = [
     "Tất cả",
     "Chờ xác nhận",
     "Đã xác nhận",
     "Đang giao hàng",
-    "Đã giao hàng",
-    "Đã hủy",
-    "Chờ thanh toán",
-    "Đã thanh toán",
-    "Huỷ do quá thời gian thanh toán",
+    "Giao hàng thành công",
+    "Đã nhận hàng",
+    "Giao hàng thất bại",
+    "Khiếu nại",
+    "Đang xử lý khiếu nại",
+    "Khiếu nại được giải quyết",
+    "Khiếu nại bị từ chối",
+    "Người mua huỷ",
+    "Người bán huỷ",
   ];
 
   const getPageNumbers = () => {
@@ -89,6 +120,151 @@ const Orders = () => {
     return pageNumbers;
   };
 
+  const handleCancelOrder = async (orderId: string, order: any) => {
+    // Hiển thị form nhập lý do hủy đơn
+    const { value: formValues } = await Swal.fire({
+      title: "Hủy đơn hàng",
+      html: `
+        <div class="text-left">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Lý do hủy đơn <span class="text-red-500">*</span>
+          </label>
+          <select id="cancelReason" class="swal2-input" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <option value="">Chọn lý do hủy đơn</option>
+            <option value="Đổi ý không muốn mua">Đổi ý không muốn mua</option>
+            <option value="Tìm được giá rẻ hơn">Tìm được giá rẻ hơn</option>
+            <option value="Thông tin sản phẩm không chính xác">Thông tin sản phẩm không chính xác</option>
+            <option value="Thời gian giao hàng quá lâu">Thời gian giao hàng quá lâu</option>
+            <option value="Khác">Khác</option>
+          </select>
+          <label class="block text-sm font-medium text-gray-700 mb-2 mt-4">
+            Ghi chú thêm (tùy chọn)
+          </label>
+          <textarea id="cancelNote" class="swal2-textarea" placeholder="Nhập ghi chú thêm nếu có..." style="width: 100%; min-height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; resize: vertical;"></textarea>
+          
+          ${
+            order.paymentStatus === "Đã thanh toán"
+              ? `
+            <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p class="text-sm text-blue-800">
+                <strong>📝 Thông báo:</strong> Đơn hàng đã thanh toán sẽ được hoàn tiền tự động trong vòng 1-3 ngày làm việc.
+              </p>
+              <p class="text-sm text-blue-700 mt-1">
+                Số tiền hoàn: <strong>${order.finalAmount.toLocaleString(
+                  "vi-VN"
+                )}đ</strong>
+              </p>
+            </div>
+          `
+              : ""
+          }
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: "Xác nhận hủy",
+      cancelButtonText: "Đóng",
+      confirmButtonColor: "#dc2626",
+      cancelButtonColor: "#6b7280",
+      focusConfirm: false,
+      preConfirm: () => {
+        const reason = (
+          document.getElementById("cancelReason") as HTMLSelectElement
+        )?.value;
+        const note = (
+          document.getElementById("cancelNote") as HTMLTextAreaElement
+        )?.value;
+
+        if (!reason) {
+          Swal.showValidationMessage("Vui lòng chọn lý do hủy đơn");
+          return false;
+        }
+
+        return {
+          reason: reason,
+          note: note,
+        };
+      },
+    });
+
+    if (!formValues) return;
+
+    // Xác nhận cuối cùng
+    const confirmResult = await Swal.fire({
+      title: "Xác nhận hủy đơn hàng?",
+      html: `
+        <div class="text-left">
+          <p><strong>Mã đơn hàng:</strong> ${orderId}</p>
+          <p><strong>Lý do:</strong> ${formValues.reason}</p>
+          ${
+            formValues.note
+              ? `<p><strong>Ghi chú:</strong> ${formValues.note}</p>`
+              : ""
+          }
+          ${
+            order.paymentStatus === "Đã thanh toán"
+              ? `
+            <div class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p class="text-sm text-yellow-800">
+                ⚠️ Đơn hàng đã thanh toán sẽ được hoàn tiền tự động
+              </p>
+            </div>
+          `
+              : ""
+          }
+        </div>
+      `,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Hủy đơn",
+      cancelButtonText: "Quay lại",
+      confirmButtonColor: "#dc2626",
+      cancelButtonColor: "#6b7280",
+    });
+
+    if (!confirmResult.isConfirmed) return;
+
+    try {
+      const res = await axiosInstance.post("orders/cancel", {
+        orderId,
+        cancelBy: "buyer",
+        reason: formValues.reason,
+        note: formValues.note,
+      });
+
+      // Hiển thị thông báo thành công với thông tin hoàn tiền nếu có
+      let successMessage = res.data.message || "Hủy đơn hàng thành công";
+
+      if (res.data.refundInfo && res.data.refundInfo.requiresRefund) {
+        successMessage += `\n💰 Hoàn tiền: ${res.data.refundInfo.amount.toLocaleString(
+          "vi-VN"
+        )}đ`;
+        if (res.data.refundInfo.autoRefund) {
+          successMessage += `\n✅ ${res.data.refundInfo.message}`;
+        } else {
+          successMessage += `\n⏳ Hoàn tiền đang được xử lý`;
+        }
+      }
+
+      await Swal.fire({
+        title: "Hủy đơn hàng thành công!",
+        text: successMessage,
+        icon: "success",
+        confirmButtonColor: "#059669",
+      });
+
+      refetch();
+    } catch (err: any) {
+      const errorMessage =
+        err.response?.data?.message || "Hủy đơn hàng thất bại";
+
+      await Swal.fire({
+        title: "Hủy đơn hàng thất bại",
+        text: errorMessage,
+        icon: "error",
+        confirmButtonColor: "#dc2626",
+      });
+    }
+  };
   return (
     <ClientLayout>
       <article className="mt-[98px]">
@@ -108,42 +284,83 @@ const Orders = () => {
           <div className="flex-1 bg-white rounded-lg shadow-sm">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold">Quản lý đơn hàng</h2>
-              <div className="w-48">
-                <span className="block text-sm font-medium text-gray-700 mb-1">
-                  Trạng thái đơn hàng:
-                </span>
-                <div className="relative">
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => {
-                      setStatusFilter(e.target.value);
-                      setPagination({ ...pagination, current: 1 });
-                    }}
-                    className="appearance-none w-full bg-white border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
-                  >
-                    {statusOptions.map((status) => (
-                      <option
-                        key={status}
-                        value={status}
-                        className="text-gray-900"
-                      >
-                        {status}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600">
-                    <svg
-                      className="h-5 w-5"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
+              <div className="flex gap-4">
+                <div className="w-48">
+                  <span className="block text-sm font-medium text-gray-700 mb-1">
+                    TT thanh toán:
+                  </span>
+                  <div className="relative">
+                    <select
+                      value={paymentStatusFilter}
+                      onChange={(e) => {
+                        setPaymentStatusFilter(e.target.value);
+                        setPagination({ ...pagination, current: 1 });
+                      }}
+                      className="appearance-none w-full bg-white border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                      {paymentStatusOptions.map((status) => (
+                        <option
+                          key={status}
+                          value={status}
+                          className="text-gray-900"
+                        >
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600">
+                      <svg
+                        className="h-5 w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div className="w-48">
+                  <span className="block text-sm font-medium text-gray-700 mb-1">
+                    TT giao hàng:
+                  </span>
+                  <div className="relative">
+                    <select
+                      value={shippingStatusFilter}
+                      onChange={(e) => {
+                        setShippingStatusFilter(e.target.value);
+                        setPagination({ ...pagination, current: 1 });
+                      }}
+                      className="appearance-none w-full bg-white border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
+                    >
+                      {shippingStatusOptions.map((status) => (
+                        <option
+                          key={status}
+                          value={status}
+                          className="text-gray-900"
+                        >
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600">
+                      <svg
+                        className="h-5 w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -162,7 +379,10 @@ const Orders = () => {
                       Ngày đặt
                     </th>
                     <th className="py-3 pr-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                      Trạng thái
+                      TT thanh toán
+                    </th>
+                    <th className="py-3 pr-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                      TT giao hàng
                     </th>
                     <th className="py-3 pr-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
                       Tổng tiền
@@ -191,30 +411,70 @@ const Orders = () => {
                         <td className="py-4 pr-6">
                           <span
                             className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                              order.status === "Huỷ do quá thời gian thanh toán"
-                                ? "bg-red-100 text-red-800"
-                                : order.status === "Đã thanh toán"
+                              order.paymentStatus === "Đã thanh toán"
                                 ? "bg-green-100 text-green-800"
-                                : order.status === "Chờ thanh toán"
+                                : order.paymentStatus === "Chờ thanh toán"
                                 ? "bg-yellow-100 text-yellow-800"
-                                : order.status === "Chờ xác nhận"
+                                : order.paymentStatus ===
+                                  "Thanh toán khi nhận hàng"
+                                ? "bg-orange-100 text-orange-800"
+                                : order.paymentStatus === "Chờ xác nhận"
                                 ? "bg-blue-100 text-blue-800"
-                                : order.status === "Đang giao hàng"
-                                ? "bg-purple-100 text-purple-800"
-                                : order.status === "Đã giao hàng"
-                                ? "bg-green-100 text-green-800"
-                                : order.status === "Đã hủy"
+                                : order.paymentStatus ===
+                                    "Huỷ do quá thời gian thanh toán" ||
+                                  order.paymentStatus ===
+                                    "Giao dịch bị từ chối do nhà phát hành"
                                 ? "bg-red-100 text-red-800"
-                                : ""
+                                : order.paymentStatus === "Người mua huỷ" ||
+                                  order.paymentStatus === "Người bán huỷ"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-gray-100 text-gray-800"
                             }`}
                           >
-                            {order.status === "Huỷ do quá thời gian thanh toán"
+                            {order.paymentStatus ===
+                            "Huỷ do quá thời gian thanh toán"
                               ? "Quá hạn thanh toán"
-                              : order.status}
+                              : order.paymentStatus}
+                          </span>
+                        </td>
+                        <td className="py-4 pr-6">
+                          <span
+                            className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              order.shippingStatus === "Đã nhận hàng"
+                                ? "bg-green-100 text-green-800"
+                                : order.shippingStatus ===
+                                  "Giao hàng thành công"
+                                ? "bg-green-100 text-green-800"
+                                : order.shippingStatus === "Đang giao hàng"
+                                ? "bg-purple-100 text-purple-800"
+                                : order.shippingStatus === "Đã xác nhận"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : order.shippingStatus === "Chờ xác nhận"
+                                ? "bg-blue-100 text-blue-800"
+                                : order.shippingStatus === "Giao hàng thất bại"
+                                ? "bg-red-100 text-red-800"
+                                : order.shippingStatus === "Khiếu nại"
+                                ? "bg-orange-100 text-orange-800"
+                                : order.shippingStatus ===
+                                  "Đang xử lý khiếu nại"
+                                ? "bg-orange-100 text-orange-800"
+                                : order.shippingStatus ===
+                                  "Khiếu nại được giải quyết"
+                                ? "bg-green-100 text-green-800"
+                                : order.shippingStatus ===
+                                  "Khiếu nại bị từ chối"
+                                ? "bg-red-100 text-red-800"
+                                : order.shippingStatus === "Người mua huỷ" ||
+                                  order.shippingStatus === "Người bán huỷ"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {order.shippingStatus}
                           </span>
                         </td>
                         <td className="py-4 pr-6 text-sm text-gray-900 font-medium">
-                          {order.totalPrice.toLocaleString("vi-VN")} đ
+                          {order.finalAmount.toLocaleString("vi-VN")} đ
                         </td>
                         <td className="py-4 pr-6 text-sm font-medium">
                           <div className="flex items-center gap-3">
@@ -224,7 +484,7 @@ const Orders = () => {
                             >
                               Chi tiết
                             </Link>
-                            {order.status === "Chờ thanh toán" &&
+                            {order.paymentStatus === "Chờ thanh toán" &&
                               order.paymentUrl && (
                                 <a
                                   href={order.paymentUrl}
@@ -235,6 +495,19 @@ const Orders = () => {
                                   Thanh toán
                                 </a>
                               )}
+                            {/* User chỉ được hủy khi chưa bắt đầu giao hàng */}
+                            {["Chờ xác nhận", "Đã xác nhận"].includes(
+                              order.shippingStatus
+                            ) && (
+                              <button
+                                onClick={() =>
+                                  handleCancelOrder(order.orderId, order)
+                                }
+                                className="text-red-600 hover:text-red-900 transition-colors duration-200"
+                              >
+                                Huỷ đơn
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -242,7 +515,7 @@ const Orders = () => {
                   ) : (
                     <tr>
                       <td
-                        colSpan={5}
+                        colSpan={7}
                         className="py-4 text-center text-sm text-gray-600"
                       >
                         Chưa có đơn hàng nào.

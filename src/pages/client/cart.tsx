@@ -7,10 +7,14 @@ import { toast } from "react-toastify";
 import { getList } from "../../api/provider";
 import Loading from "../../components/loading";
 import ClientLayout from "../../layouts/clientLayout";
+import { useState } from "react";
 
 const Cart = () => {
   const queryClient = useQueryClient();
   const { auth } = useAuth();
+
+  // State để quản lý sản phẩm được chọn
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   const {
     data: cartItems,
@@ -66,6 +70,17 @@ const Cart = () => {
     },
   });
 
+  // ✅ Helper function để lấy giá từ size được chọn
+  const getItemPrice = (item: ICartItem): number => {
+    if (!item?.productVariantId?.sizes || !item?.size) return 0;
+
+    const selectedSize = item.productVariantId.sizes.find(
+      (s: any) => s.size === item.size
+    );
+
+    return selectedSize?.price || 0;
+  };
+
   const handleDeleteItem = (productVariantId: string, size: string) => {
     if (!auth.user?.id) {
       toast.error("Bạn cần đăng nhập để thực hiện thao tác này");
@@ -82,7 +97,8 @@ const Cart = () => {
     productVariantId: string,
     size: string,
     newQuantity: number,
-    stock: number
+    stock: number,
+    currentQuantity: number
   ) => {
     if (!auth.user?.id) {
       toast.error("Bạn cần đăng nhập để thực hiện thao tác này");
@@ -92,7 +108,7 @@ const Cart = () => {
       toast.error("Số lượng phải lớn hơn 0");
       return;
     }
-    if (newQuantity > stock) {
+    if (newQuantity > currentQuantity && newQuantity > stock) {
       toast.error("Số lượng vượt quá tồn kho");
       return;
     }
@@ -117,19 +133,43 @@ const Cart = () => {
       item.productVariantId !== null
   );
 
-  const totalQuantity = validItems.reduce((sum, item) => {
+  // Hàm tạo unique key cho mỗi item (productVariantId + size)
+  const getItemKey = (item: ICartItem) =>
+    `${item.productVariantId._id}-${item.size}`;
+
+  // Hàm toggle chọn/bỏ chọn sản phẩm
+  const toggleSelectItem = (itemKey: string) => {
+    setSelectedItems((prev) =>
+      prev.includes(itemKey)
+        ? prev.filter((key) => key !== itemKey)
+        : [...prev, itemKey]
+    );
+  };
+
+  // Hàm chọn/bỏ chọn tất cả
+  const toggleSelectAll = () => {
+    if (selectedItems.length === validItems.length) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(validItems.map(getItemKey));
+    }
+  };
+
+  // Lọc ra các sản phẩm được chọn
+  const selectedValidItems = validItems.filter((item) =>
+    selectedItems.includes(getItemKey(item))
+  );
+
+  const totalQuantity = selectedValidItems.reduce((sum, item) => {
     if (!item || typeof item.quantity !== "number") return sum;
     return sum + item.quantity;
   }, 0);
 
-  const totalPrice = validItems.reduce((sum, item) => {
-    if (
-      !item?.productVariantId?.price ||
-      typeof item.productVariantId.price !== "number" ||
-      !item.quantity
-    )
-      return sum;
-    return sum + item.productVariantId.price * item.quantity;
+  // ✅ Sửa cách tính tổng tiền - chỉ tính cho sản phẩm được chọn
+  const totalPrice = selectedValidItems.reduce((sum, item) => {
+    const itemPrice = getItemPrice(item);
+    const quantity = item?.quantity || 0;
+    return sum + itemPrice * quantity;
   }, 0);
 
   return (
@@ -145,7 +185,7 @@ const Cart = () => {
                 Giỏ hàng của bạn
               </div>
               <div className="text-lg md:text-[24px] text-[#d73831] font-semibold">
-                {totalQuantity} Sản Phẩm
+                {validItems.length} Sản Phẩm
               </div>
             </div>
 
@@ -159,14 +199,29 @@ const Cart = () => {
                       item?.productVariantId?.sizes?.find(
                         (s: any) => s.size === item.size
                       )?.stock || 0;
+
+                    // ✅ Lấy giá từ size được chọn
+                    const itemPrice = getItemPrice(item);
+                    const itemKey = getItemKey(item);
+                    const isSelected = selectedItems.includes(itemKey);
+
                     return (
                       <div
                         key={item._id}
                         className={`border-b py-4 ${
                           index % 2 === 1 ? "bg-gray-50" : ""
-                        }`}
+                        } ${isSelected ? "bg-blue-50 border-blue-200" : ""}`}
                       >
                         <div className="flex gap-4">
+                          {/* Checkbox cho mobile */}
+                          <div className="flex items-start pt-2">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => toggleSelectItem(itemKey)}
+                              className="w-4 h-4"
+                            />
+                          </div>
                           <Link
                             to={`/products/${encodeURIComponent(
                               item?.productVariantId?._id || ""
@@ -225,10 +280,8 @@ const Cart = () => {
                               </div>
                               <div className="text-sm text-gray-600">
                                 <span className="font-medium">Giá:</span>{" "}
-                                {(
-                                  item?.productVariantId?.price || 0
-                                ).toLocaleString("vi-VN")}{" "}
-                                đ
+                                {/* ✅ Hiển thị giá từ size */}
+                                {itemPrice.toLocaleString("vi-VN")} đ
                               </div>
                             </div>
 
@@ -242,7 +295,8 @@ const Cart = () => {
                                       item?.productVariantId?._id || "",
                                       item.size,
                                       item.quantity - 1,
-                                      stock
+                                      stock,
+                                      item.quantity
                                     )
                                   }
                                   disabled={item.quantity <= 1}
@@ -268,7 +322,8 @@ const Cart = () => {
                                       item?.productVariantId?._id || "",
                                       item.size,
                                       item.quantity + 1,
-                                      stock
+                                      stock,
+                                      item.quantity
                                     )
                                   }
                                   disabled={item.quantity >= stock}
@@ -300,10 +355,9 @@ const Cart = () => {
                             </div>
 
                             <div className="font-medium text-right mt-2">
-                              Tổng:{" "}
+                              Tổng: {/* ✅ Tính tổng từ giá size thực tế */}
                               {(
-                                (item?.productVariantId?.price || 0) *
-                                (item?.quantity || 0)
+                                itemPrice * (item?.quantity || 0)
                               ).toLocaleString("vi-VN")}{" "}
                               đ
                             </div>
@@ -323,6 +377,17 @@ const Cart = () => {
               <table className="hidden lg:table w-full bg-white table-auto border-collapse">
                 <thead className="border-b bg-gray-50">
                   <tr>
+                    <th className="py-3 pr-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                      <input
+                        type="checkbox"
+                        checked={
+                          selectedItems.length === validItems.length &&
+                          validItems.length > 0
+                        }
+                        onChange={toggleSelectAll}
+                        className="w-4 h-4"
+                      />
+                    </th>
                     <th className="py-3 pr-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
                       Sản phẩm
                     </th>
@@ -348,13 +413,27 @@ const Cart = () => {
                         item?.productVariantId?.sizes?.find(
                           (s: any) => s.size === item.size
                         )?.stock || 0;
+
+                      // ✅ Lấy giá từ size được chọn
+                      const itemPrice = getItemPrice(item);
+                      const itemKey = getItemKey(item);
+                      const isSelected = selectedItems.includes(itemKey);
+
                       return (
                         <tr
                           key={item._id}
                           className={`border-b hover:bg-gray-50 ${
                             index % 2 === 1 ? "bg-gray-100" : ""
-                          }`}
+                          } ${isSelected ? "bg-blue-50 border-blue-200" : ""}`}
                         >
+                          <td className="pr-4 py-2 text-sm text-gray-700">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => toggleSelectItem(itemKey)}
+                              className="w-4 h-4"
+                            />
+                          </td>
                           <td className="pr-4 py-2 text-sm text-gray-700">
                             <div className="flex items-center gap-4">
                               <Link
@@ -420,7 +499,8 @@ const Cart = () => {
                                     item?.productVariantId?._id || "",
                                     item.size,
                                     item.quantity - 1,
-                                    stock
+                                    stock,
+                                    item.quantity
                                   )
                                 }
                                 disabled={item.quantity <= 1}
@@ -446,7 +526,8 @@ const Cart = () => {
                                     item?.productVariantId?._id || "",
                                     item.size,
                                     item.quantity + 1,
-                                    stock
+                                    stock,
+                                    item.quantity
                                   )
                                 }
                                 disabled={item.quantity >= stock}
@@ -465,16 +546,14 @@ const Cart = () => {
                             {item.size}
                           </td>
                           <td className="pr-4 py-2 text-sm text-gray-700">
-                            {(item?.productVariantId?.price).toLocaleString(
-                              "vi-VN"
-                            )}{" "}
-                            đ
+                            {/* ✅ Hiển thị giá từ size */}
+                            {itemPrice.toLocaleString("vi-VN")} đ
                           </td>
                           <td className="pr-4 py-2 text-sm text-gray-700">
-                            {(
-                              (item?.productVariantId?.price || 0) *
-                              (item?.quantity || 0)
-                            ).toLocaleString("vi-VN")}{" "}
+                            {/* ✅ Tính tổng từ giá size thực tế */}
+                            {(itemPrice * (item?.quantity || 0)).toLocaleString(
+                              "vi-VN"
+                            )}{" "}
                             đ
                           </td>
                           <td
@@ -499,7 +578,7 @@ const Cart = () => {
                   ) : (
                     <tr>
                       <td
-                        colSpan={5}
+                        colSpan={7}
                         className="px-4 py-2 text-center text-sm text-gray-600"
                       >
                         Giỏ hàng của bạn trống.
@@ -556,14 +635,18 @@ const Cart = () => {
               <hr />
             </div>
             <div className="mt-4">
-              {validItems.length === 0 ? (
+              {selectedItems.length === 0 ? (
                 <p className="bg-black w-full h-[50px] rounded-tl-2xl rounded-br-2xl flex items-center justify-center text-sm lg:text-[16px] md:text-[12px] text-white font-semibold opacity-50 cursor-not-allowed transition-all duration-300">
-                  GIỎ HÀNG TRỐNG
+                  CHỌN SẢN PHẨM ĐỂ ĐẶT HÀNG
                 </p>
               ) : (
-                <Link to="/dathang" className="block w-full">
+                <Link
+                  to="/dathang"
+                  state={{ selectedItems: selectedValidItems }}
+                  className="block w-full"
+                >
                   <p className="bg-black w-full h-[50px] rounded-tl-2xl rounded-br-2xl flex items-center justify-center text-sm lg:text-[16px] md:text-[12px] text-white font-semibold hover:bg-white hover:text-black hover:border hover:border-black cursor-pointer transition-all duration-300">
-                    ĐẶT HÀNG
+                    ĐẶT HÀNG ({selectedItems.length} SẢN PHẨM)
                   </p>
                 </Link>
               )}

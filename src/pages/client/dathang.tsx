@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ICartItem } from "../../types/cart";
 import { useAuth } from "../../context/auth.context";
@@ -14,9 +14,11 @@ import SelectAddressModal from "../../components/SelectAddressModal";
 
 const Dathang = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const { auth } = useAuth();
   const [showProducts, setShowProducts] = useState(false);
+  const [isPending, setisPending] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [isFetchingShippingFee, setIsFetchingShippingFee] = useState(false);
   const [voucher, setVoucher] = useState("");
@@ -25,6 +27,11 @@ const Dathang = () => {
   );
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAddressModal, setShowAddressModal] = useState(false);
+
+  // Lấy selectedItems từ location.state (từ trang cart)
+  const selectedItemsFromCart =
+    (location.state?.selectedItems as ICartItem[]) || [];
+
   interface Address {
     _id?: string;
     receiver_name?: string;
@@ -35,19 +42,21 @@ const Dathang = () => {
     ward?: any;
     type?: string;
   }
+
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [shippingFee, setShippingFee] = useState(0);
-  const [lastAddedAddressId, setLastAddedAddressId] = useState<string | null>(null);
+  const [lastAddedAddressId, setLastAddedAddressId] = useState<string | null>(
+    null
+  );
 
-  const {
-    data: cartItems,
-    isLoading: cartLoading,
-    error: cartError,
-  } = useQuery({
-    queryKey: ["cart"],
-    queryFn: async () => getList({ namespace: `cart` }),
-    staleTime: 60 * 1000,
-  });
+  // Kiểm tra nếu không có sản phẩm được chọn, chuyển hướng về cart
+  useEffect(() => {
+    if (selectedItemsFromCart.length === 0) {
+      toast.warning("Vui lòng chọn sản phẩm từ giỏ hàng");
+      navigate("/cart");
+    }
+  }, [selectedItemsFromCart, navigate]);
+
   const {
     data: userData,
     isLoading: userLoading,
@@ -58,6 +67,7 @@ const Dathang = () => {
       getById({ namespace: `auth/shipping-address`, id: auth.user.id }),
     staleTime: 60 * 1000,
   });
+
   const {
     data: myInfoData,
     isLoading: isMyInfoLoading,
@@ -72,10 +82,8 @@ const Dathang = () => {
     myInfoData || {};
 
   let content = null;
-  if (cartLoading || userLoading || isMyInfoLoading) {
+  if (userLoading || isMyInfoLoading) {
     content = <Loading />;
-  } else if (cartError) {
-    content = <div>Lỗi khi tải giỏ hàng: {(cartError as Error).message}</div>;
   } else if (userError) {
     content = (
       <div>
@@ -121,8 +129,8 @@ const Dathang = () => {
         .join(", ")
     : "";
 
-  const items: ICartItem[] = cartItems?.items || [];
-  const validItems = items.filter(
+  // Sử dụng selectedItemsFromCart thay vì cartItems
+  const validItems = selectedItemsFromCart.filter(
     (item) =>
       item &&
       item.productVariantId &&
@@ -135,32 +143,37 @@ const Dathang = () => {
     return sum + item.quantity;
   }, 0);
 
+  // Hàm helper để lấy giá theo size
+  const getPriceForSize = (item: ICartItem) => {
+    if (!item.productVariantId?.sizes || !item.size) return 0;
+    const sizeInfo = item.productVariantId.sizes.find(
+      (s: any) => s.size === item.size
+    );
+    return sizeInfo?.price || 0;
+  };
+
   const totalPrice = validItems.reduce((sum, item) => {
-    if (
-      !item?.productVariantId?.price ||
-      typeof item.productVariantId.price !== "number" ||
-      !item.quantity
-    )
-      return sum;
-    return sum + item.productVariantId.price * item.quantity;
+    const price = getPriceForSize(item);
+    if (!price || !item.quantity) return sum;
+    return sum + price * item.quantity;
   }, 0);
-  console.log("✅ totalPrice:", totalPrice);
 
   const cleanLocationName = (name: string = "") =>
     name.replace(/^(Tỉnh|Thành phố)\s+/g, "").trim();
+
   useEffect(() => {
     const fetchShippingFee = async () => {
       if (
         currentAddress?.city?.name &&
         currentAddress?.district?.name &&
         currentAddress?.ward?.name &&
-        items.length > 0
+        selectedItemsFromCart.length > 0
       ) {
         const cleanedCity = cleanLocationName(currentAddress.city.name);
         const cleanedDistrict = cleanLocationName(currentAddress.district.name);
         const cleanedWard = cleanLocationName(currentAddress.ward.name);
 
-        const validItems = items.filter(
+        const validItemsForShipping = selectedItemsFromCart.filter(
           (item) =>
             item &&
             item.productVariantId &&
@@ -168,22 +181,20 @@ const Dathang = () => {
             item.productVariantId !== null
         );
 
-        const totalPrice = validItems.reduce((sum, item) => {
-          if (
-            !item?.productVariantId?.price ||
-            typeof item.productVariantId.price !== "number" ||
-            !item.quantity
-          )
-            return sum;
-          return sum + item.productVariantId.price * item.quantity;
+        const totalPrice = validItemsForShipping.reduce((sum, item) => {
+          const price = getPriceForSize(item);
+          if (!price || !item.quantity) return sum;
+          return sum + price * item.quantity;
         }, 0);
 
-        const totalWeight = validItems.reduce((sum, item) => {
+        const totalWeight = validItemsForShipping.reduce((sum, item) => {
           return sum + (item.quantity || 0) * 300;
         }, 0);
-        const totalHeight = validItems.reduce((sum, item) => {
+
+        const totalHeight = validItemsForShipping.reduce((sum, item) => {
           return sum + (item.quantity || 0) * 4;
         }, 0);
+
         try {
           setIsFetchingShippingFee(true);
           const res = await axiosInstance.post("/cart/fee", {
@@ -207,13 +218,49 @@ const Dathang = () => {
     };
 
     fetchShippingFee();
-  }, [currentAddress, items]); // 👈 chỉ theo dõi `items`, không theo dõi các biến dẫn đến loop
+  }, [currentAddress, selectedItemsFromCart]);
+
+  // Hàm helper để tạo items payload với version
+  const createItemsPayload = (validItems: ICartItem[]) => {
+    return validItems.map((item) => ({
+      productVariantId: item.productVariantId._id,
+      productName: item.productVariantId.productId?.name || "Unnamed Product",
+      price: getPriceForSize(item),
+      quantity: item.quantity,
+      size: item.size,
+      version: (item.productVariantId as any).version || 0, // Thêm version từ variant
+    }));
+  };
+
+  // Hàm helper để xóa các sản phẩm đã chọn khỏi giỏ hàng
+  const removeSelectedItemsFromCart = async (validItems: ICartItem[]) => {
+    try {
+      for (const item of validItems) {
+        await axiosInstance.post(
+          `${import.meta.env.VITE_API_URL}/cart/remove`,
+          {
+            userId: auth.user.id,
+            productVariantId: item.productVariantId._id,
+            size: item.size,
+          }
+        );
+      }
+
+      // Invalidate cart queries để UI cập nhật
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      queryClient.invalidateQueries({ queryKey: ["cartQuantity"] });
+    } catch (error) {
+      console.error("Lỗi khi xóa sản phẩm khỏi giỏ hàng:", error);
+      // Không throw error vì đặt hàng đã thành công
+    }
+  };
 
   const handlePayment = async () => {
     if (!auth.user.id) {
       toast.error("Bạn cần đăng nhập để thực hiện thanh toán");
       return;
     }
+
     const currentAddress = selectedAddress || userData[0];
     const addressStr =
       currentAddress.address +
@@ -226,18 +273,10 @@ const Dathang = () => {
 
     try {
       if (paymentMethod === "cod") {
-        console.log("userData[0].cityName:", currentAddress.city?.name);
-
+        setisPending(true);
         const payload = {
           orderId: "COD_" + new Date().getTime(),
-          items: validItems.map((item) => ({
-            productVariantId: item.productVariantId._id,
-            productName:
-              item.productVariantId.productId?.name || "Unnamed Product",
-            price: item.productVariantId.price,
-            quantity: item.quantity,
-            size: item.size,
-          })),
+          items: createItemsPayload(validItems), // Sử dụng helper function
           totalPrice: totalPrice || 0,
           receiver: {
             name: currentAddress.receiver_name,
@@ -258,9 +297,14 @@ const Dathang = () => {
             payload
           );
 
-          await axiosInstance.get(`${import.meta.env.VITE_API_URL}/cart/clear`);
+          // Xóa từng sản phẩm đã chọn khỏi giỏ hàng
+          await removeSelectedItemsFromCart(validItems);
+
+          setisPending(false);
           toast.success("Đặt hàng thành công!");
-          navigate(`/ordersuccess?orderId=${payload.orderId}`);
+          navigate(
+            `/ordersuccess/${payload.orderId}?orderId=${payload.orderId}`
+          );
         } catch (error: any) {
           throw new Error(
             error.response?.data?.message || "Thanh toán thất bại"
@@ -271,18 +315,13 @@ const Dathang = () => {
           toast.error("Số tiền thanh toán phải từ 1.000đ đến 50.000.000đ");
           return;
         }
+
+        setisPending(true);
         const orderId = "MoMo_" + new Date().getTime();
-        // Tạo payload cho đơn hàng MoMo
+
         const payload = {
           orderId,
-          items: validItems.map((item) => ({
-            productVariantId: item.productVariantId._id,
-            productName:
-              item.productVariantId.productId?.name || "Unnamed Product",
-            price: item.productVariantId.price,
-            quantity: item.quantity,
-            size: item.size,
-          })),
+          items: createItemsPayload(validItems), // Sử dụng helper function
           receiver: {
             name: currentAddress.receiver_name,
             cityName: currentAddress.city?.name || "",
@@ -305,14 +344,7 @@ const Dathang = () => {
         try {
           const momoPayload = {
             orderId: payload.orderId,
-            items: validItems.map((item) => ({
-              productVariantId: item.productVariantId._id,
-              productName:
-                item.productVariantId.productId?.name || "Unnamed Product",
-              price: item.productVariantId.price,
-              quantity: item.quantity,
-              size: item.size,
-            })),
+            items: createItemsPayload(validItems), // Sử dụng helper function
             totalPrice: payload.totalPrice,
             receiver: {
               name: payload.receiver.name,
@@ -344,14 +376,18 @@ const Dathang = () => {
             console.error("Lỗi MoMo:", momoResponse.data);
             throw new Error(errorMessage);
           }
+
           payload.paymentUrl = momoResponse.data.payUrl;
           await axiosInstance.post(
             `${import.meta.env.VITE_API_URL}/orders`,
             payload
           );
 
-          await axiosInstance.get(`${import.meta.env.VITE_API_URL}/cart/clear`);
-          window.open(momoResponse.data.payUrl, "_blank");
+          // Xóa từng sản phẩm đã chọn khỏi giỏ hàng
+          await removeSelectedItemsFromCart(validItems);
+
+          setisPending(false);
+          window.location.href = momoResponse.data.payUrl;
         } catch (error: any) {
           console.error("Lỗi thanh toán MoMo:", error);
           const errorMessage =
@@ -361,8 +397,10 @@ const Dathang = () => {
           toast.error(errorMessage);
         }
       } else if (paymentMethod === "zalopay") {
+        setisPending(true);
         const transID = Math.floor(Math.random() * 1000000);
         const orderId = `${moment().format("YYMMDD")}_${transID}`;
+
         const payload = {
           orderId: orderId,
           receiver: {
@@ -374,14 +412,7 @@ const Dathang = () => {
             address: currentAddress.address || "",
             type: currentAddress.type || "home",
           },
-          items: validItems.map((item) => ({
-            productVariantId: item.productVariantId._id,
-            productName:
-              item.productVariantId.productId?.name || "Unnamed Product",
-            price: item.productVariantId.price,
-            quantity: item.quantity,
-            size: item.size,
-          })),
+          items: createItemsPayload(validItems), // Sử dụng helper function
           totalPrice: totalPrice || 0,
           paymentMethod: "zalopay",
           orderInfo: "Thanh toán qua ZaloPay",
@@ -390,6 +421,7 @@ const Dathang = () => {
           paymentUrl: "",
           voucherCode: voucher || null,
         };
+
         const zaloPayload = {
           orderId: payload.orderId,
           receiver: {
@@ -401,18 +433,12 @@ const Dathang = () => {
             address: payload.receiver.address,
             type: payload.receiver.type,
           },
-          items: validItems.map((item) => ({
-            productVariantId: item.productVariantId._id,
-            productName:
-              item.productVariantId.productId?.name || "Unnamed Product",
-            price: item.productVariantId.price,
-            quantity: item.quantity,
-            size: item.size,
-          })),
+          items: createItemsPayload(validItems), // Sử dụng helper function
           totalPrice: totalPrice,
           voucherCode: voucher || null,
           orderInfo: payload.orderInfo,
         };
+
         console.log("ZaloPay Payment Request:", zaloPayload);
 
         try {
@@ -437,8 +463,11 @@ const Dathang = () => {
             payload
           );
 
-          await axiosInstance.get(`${import.meta.env.VITE_API_URL}/cart/clear`);
-          window.open(zaloResponse.data.order_url, "_blank");
+          // Xóa từng sản phẩm đã chọn khỏi giỏ hàng
+          await removeSelectedItemsFromCart(validItems);
+
+          setisPending(false);
+          window.location.href = zaloResponse.data.order_url;
         } catch (error) {
           console.error("Lỗi ZaloPay:", error);
           throw error;
@@ -449,12 +478,16 @@ const Dathang = () => {
       toast.error(
         error.response?.data?.message ||
           error.message ||
-          "Có lỗi xảy ra khi thanh toán MoMo"
+          "Có lỗi xảy ra khi thanh toán"
       );
+      setisPending(false);
     }
   };
+
   const [discountAmount, setDiscountAmount] = useState(0);
   const [appliedVoucherId, setAppliedVoucherId] = useState("");
+  const [userVouchers, setUserVouchers] = useState<any[]>([]);
+  const [loadingUserVouchers, setLoadingUserVouchers] = useState(false);
 
   const handleApplyVoucher = async () => {
     if (!voucher) {
@@ -465,6 +498,53 @@ const Dathang = () => {
     try {
       const res = await axiosInstance.post("/vouchers/apply", {
         code: voucher,
+        userId: auth.user.id,
+        cartTotal: totalPrice,
+      });
+
+      setDiscountAmount(res.data.discount);
+      setAppliedVoucherId(res.data.voucherId);
+      toast.success(
+        `Áp dụng thành công. Giảm ${res.data.discount.toLocaleString("vi-VN")}đ`
+      );
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Mã giảm giá không hợp lệ");
+      setDiscountAmount(0);
+      setAppliedVoucherId("");
+    }
+  };
+
+  // Fetch user vouchers khi switch tab hoặc totalPrice thay đổi
+  const fetchUserVouchers = async () => {
+    if (!auth.user.id) return;
+
+    try {
+      setLoadingUserVouchers(true);
+      const res = await axiosInstance.get(
+        `/vouchers/user/${auth.user.id}?cartTotal=${totalPrice}`
+      );
+      setUserVouchers(res.data.vouchers || []);
+    } catch (error) {
+      console.error("Lỗi khi lấy voucher user:", error);
+      setUserVouchers([]);
+    } finally {
+      setLoadingUserVouchers(false);
+    }
+  };
+
+  // Load voucher khi chuyển tab "Mã của tôi" hoặc totalPrice thay đổi
+  useEffect(() => {
+    if (voucherTab === "ma-cua-toi") {
+      fetchUserVouchers();
+    }
+  }, [voucherTab, totalPrice, auth.user.id]);
+
+  // Hàm apply voucher từ danh sách "Mã của tôi"
+  const handleApplyUserVoucher = async (voucherCode: string) => {
+    setVoucher(voucherCode);
+    try {
+      const res = await axiosInstance.post("/vouchers/apply", {
+        code: voucherCode,
         userId: auth.user.id,
         cartTotal: totalPrice,
       });
@@ -619,95 +699,95 @@ const Dathang = () => {
                       </thead>
                       <tbody>
                         {validItems.length > 0 ? (
-                          validItems.map((item: ICartItem, index: number) => (
-                            <tr
-                              key={item._id}
-                              className={`border-b hover:bg-gray-50 ${
-                                index % 2 === 1 ? "bg-gray-100" : ""
-                              }`}
-                            >
-                              <td className="pr-4 py-2 text-sm text-gray-700">
-                                <div className="flex items-center gap-4">
-                                  <Link
-                                    to={`/products/${encodeURIComponent(
-                                      item?.productVariantId?._id || ""
-                                    )}`}
-                                    className="group relative block"
-                                  >
-                                    <img
-                                      src={
-                                        item?.productVariantId?.images?.main
-                                          ?.url || "/fallback.jpg"
-                                      }
-                                      alt={
-                                        item?.productVariantId?.productId
-                                          ?.name || "Product"
-                                      }
-                                      className="w-18 h-[100px] object-cover rounded transition-opacity duration-300 ease-in-out opacity-100 group-hover:opacity-0"
-                                      onError={(e) =>
-                                        (e.currentTarget.src = "/fallback.jpg")
-                                      }
-                                    />
-                                    <img
-                                      src={
-                                        item?.productVariantId?.images?.hover
-                                          ?.url || "/fallback.jpg"
-                                      }
-                                      alt={
-                                        item?.productVariantId?.productId
-                                          ?.name || "Product"
-                                      }
-                                      className="w-18 h-[100px] object-cover rounded absolute top-0 left-0 transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100"
-                                      onError={(e) =>
-                                        (e.currentTarget.src = "/fallback.jpg")
-                                      }
-                                    />
-                                  </Link>
-                                  <div>
+                          validItems.map((item: ICartItem, index: number) => {
+                            const itemPrice = getPriceForSize(item);
+                            return (
+                              <tr
+                                key={item._id}
+                                className={`border-b hover:bg-gray-50 ${
+                                  index % 2 === 1 ? "bg-gray-100" : ""
+                                }`}
+                              >
+                                <td className="pr-4 py-2 text-sm text-gray-700">
+                                  <div className="flex items-center gap-4">
                                     <Link
                                       to={`/products/${encodeURIComponent(
                                         item?.productVariantId?._id || ""
                                       )}`}
-                                      className="hover:text-orange-600 transition-all duration-300 font-medium"
+                                      className="group relative block"
                                     >
-                                      {item?.productVariantId?.productId
-                                        ?.name || "Unnamed Product"}
+                                      <img
+                                        src={
+                                          item?.productVariantId?.images?.main
+                                            ?.url || "/fallback.jpg"
+                                        }
+                                        alt={
+                                          item?.productVariantId?.productId
+                                            ?.name || "Product"
+                                        }
+                                        className="w-18 h-[100px] object-cover rounded transition-opacity duration-300 ease-in-out opacity-100 group-hover:opacity-0"
+                                        onError={(e) =>
+                                          (e.currentTarget.src =
+                                            "/fallback.jpg")
+                                        }
+                                      />
+                                      <img
+                                        src={
+                                          item?.productVariantId?.images?.hover
+                                            ?.url || "/fallback.jpg"
+                                        }
+                                        alt={
+                                          item?.productVariantId?.productId
+                                            ?.name || "Product"
+                                        }
+                                        className="w-18 h-[100px] object-cover rounded absolute top-0 left-0 transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100"
+                                        onError={(e) =>
+                                          (e.currentTarget.src =
+                                            "/fallback.jpg")
+                                        }
+                                      />
                                     </Link>
-                                    {/* Màu sắc ngay dưới tên sản phẩm */}
-                                    <div className="text-base text-gray-600 mt-1">
-                                      Màu sắc:{" "}
-                                      {item.productVariantId?.color
-                                        ?.colorName || "Không có"}
+                                    <div>
+                                      <Link
+                                        to={`/products/${encodeURIComponent(
+                                          item?.productVariantId?._id || ""
+                                        )}`}
+                                        className="hover:text-orange-600 transition-all duration-300 font-medium"
+                                      >
+                                        {item?.productVariantId?.productId
+                                          ?.name || "Unnamed Product"}
+                                      </Link>
+                                      <div className="text-base text-gray-600 mt-1">
+                                        Màu sắc:{" "}
+                                        {item.productVariantId?.color
+                                          ?.colorName || "Không có"}
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              </td>
-                              <td className="pr-4 py-2 text-sm text-gray-700">
-                                <div
-                                  id={`quantityDisplay-${item._id}`}
-                                  className="flex items-center justify-center text-center text-sm border border-gray-300 w-12 h-8 z-10 rounded-tl-[20px] rounded-br-[20px]"
-                                >
-                                  {item.quantity}
-                                </div>
-                              </td>
-                              <td className="pr-4 py-2 text-sm text-gray-700">
-                                {item.size}
-                              </td>
-                              <td className="pr-4 py-2 text-sm text-gray-700">
-                                {item?.productVariantId?.price.toLocaleString(
-                                  "vi-VN"
-                                )}{" "}
-                                đ
-                              </td>
-                              <td className="pr-4 py-2 text-sm text-gray-700">
-                                {(
-                                  (item?.productVariantId?.price || 0) *
-                                  (item?.quantity || 0)
-                                ).toLocaleString("vi-VN")}{" "}
-                                đ
-                              </td>
-                            </tr>
-                          ))
+                                </td>
+                                <td className="pr-4 py-2 text-sm text-gray-700">
+                                  <div
+                                    id={`quantityDisplay-${item._id}`}
+                                    className="flex items-center justify-center text-center text-sm border border-gray-300 w-12 h-8 z-10 rounded-tl-[20px] rounded-br-[20px]"
+                                  >
+                                    {item.quantity}
+                                  </div>
+                                </td>
+                                <td className="pr-4 py-2 text-sm text-gray-700">
+                                  {item.size}
+                                </td>
+                                <td className="pr-4 py-2 text-sm text-gray-700">
+                                  {itemPrice.toLocaleString("vi-VN")} đ
+                                </td>
+                                <td className="pr-4 py-2 text-sm text-gray-700">
+                                  {(
+                                    itemPrice * (item?.quantity || 0)
+                                  ).toLocaleString("vi-VN")}{" "}
+                                  đ
+                                </td>
+                              </tr>
+                            );
+                          })
                         ) : (
                           <tr>
                             <td
@@ -728,6 +808,13 @@ const Dathang = () => {
                   <div className="text-[20px] text-[#221F20]">
                     Tóm tắt đơn hàng
                   </div>
+                  {validItems.length > 0 && (
+                    <div className="mt-2 mb-2 p-2 bg-blue-50 rounded border border-blue-200">
+                      <div className="text-sm text-blue-800 font-medium">
+                        🛒 {validItems.length} sản phẩm đã chọn từ giỏ hàng
+                      </div>
+                    </div>
+                  )}
                   <br />
                   <div className="text-[14px] text-[#57585A]">
                     <div className="flex justify-between">
@@ -805,8 +892,101 @@ const Dathang = () => {
                       </div>
                     )}
                     {voucherTab === "ma-cua-toi" && (
-                      <div className="mb-2 text-gray-500 text-sm">
-                        Bạn chưa có mã nào.
+                      <div className="mb-2">
+                        {loadingUserVouchers ? (
+                          <div className="flex items-center justify-center py-4">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-black"></div>
+                            <span className="ml-2 text-gray-600 text-sm">
+                              Đang tải...
+                            </span>
+                          </div>
+                        ) : userVouchers.length === 0 ? (
+                          <div className="text-gray-500 text-sm">
+                            Bạn chưa có mã nào có thể sử dụng.
+                          </div>
+                        ) : (
+                          <div className="space-y-2 max-h-40 overflow-y-auto">
+                            {userVouchers.map((userVoucher: any) => {
+                              const isApplied =
+                                appliedVoucherId === userVoucher._id;
+                              const discountText =
+                                userVoucher.type === "percent"
+                                  ? `${userVoucher.value}%`
+                                  : `${userVoucher.value.toLocaleString(
+                                      "vi-VN"
+                                    )}đ`;
+                              const maxDiscountText = userVoucher.maxDiscount
+                                ? ` (tối đa ${userVoucher.maxDiscount.toLocaleString(
+                                    "vi-VN"
+                                  )}đ)`
+                                : "";
+
+                              return (
+                                <div
+                                  key={userVoucher._id}
+                                  className={`p-2 border rounded-lg text-xs ${
+                                    isApplied
+                                      ? "border-green-500 bg-green-50"
+                                      : "border-gray-200 hover:border-gray-300"
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-1 mb-1">
+                                        <span
+                                          className={`text-xs font-bold px-2 py-1 rounded ${
+                                            isApplied
+                                              ? "bg-green-100 text-green-800"
+                                              : "bg-blue-100 text-blue-800"
+                                          }`}
+                                        >
+                                          {userVoucher.code}
+                                        </span>
+                                        <span className="text-xs font-medium text-gray-900">
+                                          -{discountText}
+                                          {maxDiscountText}
+                                        </span>
+                                      </div>
+                                      <p className="text-xs text-gray-600 mb-1 line-clamp-1">
+                                        {userVoucher.description}
+                                      </p>
+                                      <div className="flex gap-2 text-xs text-gray-500">
+                                        <span>
+                                          Tối thiểu:{" "}
+                                          {userVoucher.minOrderValue.toLocaleString(
+                                            "vi-VN"
+                                          )}
+                                          đ
+                                        </span>
+                                        <span>
+                                          HSD:{" "}
+                                          {userVoucher.expiresAt
+                                            ? new Date(
+                                                userVoucher.expiresAt
+                                              ).toLocaleDateString("vi-VN")
+                                            : "Không giới hạn"}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    <button
+                                      onClick={() =>
+                                        handleApplyUserVoucher(userVoucher.code)
+                                      }
+                                      disabled={isApplied}
+                                      className={`px-3 py-1 text-xs font-medium rounded transition ${
+                                        isApplied
+                                          ? "bg-green-500 text-white cursor-not-allowed"
+                                          : "bg-black text-white hover:bg-gray-800"
+                                      }`}
+                                    >
+                                      {isApplied ? "Đã dùng" : "Dùng"}
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -825,7 +1005,9 @@ const Dathang = () => {
                     {isFetchingShippingFee
                       ? "ĐANG TÍNH PHÍ..."
                       : validItems.length === 0
-                      ? "GIỎ HÀNG TRỐNG"
+                      ? "KHÔNG CÓ SẢN PHẨM"
+                      : isPending
+                      ? "ĐANG XỬ LÝ..."
                       : "HOÀN THÀNH"}
                   </button>
                 </div>
@@ -839,7 +1021,9 @@ const Dathang = () => {
           defaultAddressId={userData[0]?._id || null}
           onClose={() => setShowAddModal(false)}
           onSuccess={(newAddressId?: string) => {
-            queryClient.invalidateQueries({ queryKey: ["users", auth.user.id] });
+            queryClient.invalidateQueries({
+              queryKey: ["users", auth.user.id],
+            });
             queryClient.invalidateQueries({ queryKey: ["myInfo"] });
             if (newAddressId) setLastAddedAddressId(newAddressId);
           }}
