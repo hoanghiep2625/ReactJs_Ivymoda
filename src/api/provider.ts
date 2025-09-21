@@ -1,7 +1,5 @@
 import axiosInstance from "../services/axiosInstance";
 
-axiosInstance.defaults.baseURL = import.meta.env.VITE_API_URL;
-
 export type ProviderProps = {
   namespace: string;
   id?: string;

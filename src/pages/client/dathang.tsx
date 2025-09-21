@@ -236,14 +236,11 @@ const Dathang = () => {
   const removeSelectedItemsFromCart = async (validItems: ICartItem[]) => {
     try {
       for (const item of validItems) {
-        await axiosInstance.post(
-          `${import.meta.env.VITE_API_URL}/cart/remove`,
-          {
-            userId: auth.user.id,
-            productVariantId: item.productVariantId._id,
-            size: item.size,
-          }
-        );
+        await axiosInstance.post(`/cart/remove`, {
+          userId: auth.user.id,
+          productVariantId: item.productVariantId._id,
+          size: item.size,
+        });
       }
 
       // Invalidate cart queries để UI cập nhật
@@ -292,10 +289,7 @@ const Dathang = () => {
         };
 
         try {
-          await axiosInstance.post(
-            `${import.meta.env.VITE_API_URL}/orders`,
-            payload
-          );
+          await axiosInstance.post(`/orders`, payload);
 
           // Xóa từng sản phẩm đã chọn khỏi giỏ hàng
           await removeSelectedItemsFromCart(validItems);
@@ -364,7 +358,7 @@ const Dathang = () => {
           console.log("MoMo Payment Request:", momoPayload);
 
           const momoResponse = await axiosInstance.post(
-            `${import.meta.env.VITE_API_URL}/orders/momo/create`,
+            `/orders/momo/create`,
             momoPayload
           );
 
@@ -378,10 +372,7 @@ const Dathang = () => {
           }
 
           payload.paymentUrl = momoResponse.data.payUrl;
-          await axiosInstance.post(
-            `${import.meta.env.VITE_API_URL}/orders`,
-            payload
-          );
+          await axiosInstance.post(`/orders`, payload);
 
           // Xóa từng sản phẩm đã chọn khỏi giỏ hàng
           await removeSelectedItemsFromCart(validItems);
@@ -443,7 +434,7 @@ const Dathang = () => {
 
         try {
           const zaloResponse = await axiosInstance.post(
-            `${import.meta.env.VITE_API_URL}/orders/zalopay/create`,
+            `/orders/zalopay/create`,
             zaloPayload
           );
 
@@ -458,10 +449,7 @@ const Dathang = () => {
           }
 
           payload.paymentUrl = zaloResponse.data.order_url;
-          await axiosInstance.post(
-            `${import.meta.env.VITE_API_URL}/orders`,
-            payload
-          );
+          await axiosInstance.post(`/orders`, payload);
 
           // Xóa từng sản phẩm đã chọn khỏi giỏ hàng
           await removeSelectedItemsFromCart(validItems);

@@ -1,60 +1,90 @@
-name: Deploy to VPS
+name: Build and Deploy
 
 on:
   push:
-    branches:
-      - master
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: hoanghiep2625/elavia
 
 jobs:
-  deploy:
+  build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
-      - name: Checkout code (metadata only)
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.9.0
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Deploy to VPS
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assert deploy secrets exist
         run: |
-          ssh -o StrictHostKeyChecking=no root@14.225.198.220 '
-          set -e
+          [ -n "${{ secrets.VPS_HOST }}" ] || (echo "Missing VPS_HOST" && exit 1)
+          [ -n "${{ secrets.VPS_USER }}" ] || (echo "Missing VPS_USER" && exit 1)
+          [ -n "${{ secrets.VPS_SSH_KEY }}" ] || (echo "Missing VPS_SSH_KEY" && exit 1)
 
-          # Clone nếu repo chưa tồn tại
-          if [ ! -d /root/Elavia/Client/.git ]; then
-            mkdir -p /root/Elavia
-            cd /root/Elavia
-            git clone https://github.com/hoanghiep2625/Elavia-Client.git Client
-          fi
+      # (tùy chọn) test SSH
+      - name: Quick SSH test
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_PASSPHRASE }}
+          script: "echo 'SSH OK:' $(hostname)"
 
-          cd /root/Elavia/Client
+      - name: Deploy on VPS via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_PASSPHRASE }}
+          script: |
+            set -e
+            cd /srv/tahoanghiep/elavia
 
-          # 1) HỦY MERGE DỞ + DỌN RÁC
-          git merge --abort || true
-          git reset --hard
-          git clean -fd
+            # Nếu package GHCR là private, login trước khi pull
+            if [ -n "${{ secrets.GHCR_READ_TOKEN }}" ]; then
+              echo "${{ secrets.GHCR_READ_TOKEN }}" | docker login ghcr.io -u hoanghiep2625 --password-stdin
+            fi
+            sed -i "s#ghcr.io/.*/elavia:.*#ghcr.io/${{ github.repository_owner }}/elavia:${{ github.sha }}#g" docker-compose.yml
 
-          # 2) ĐỒNG BỘ REMOTE & LẤY NHÁNH MỚI NHẤT
-          git remote set-url origin https://github.com/hoanghiep2625/Elavia-Client.git
-          git fetch --all --prune
-
-          # 3) NHÁNH ĐÚNG GIỜ LÀ "main" (vì origin/master đã bị xóa)
-          git checkout main || git checkout -b main
-          git reset --hard origin/main
-          git clean -fd
-
-          # 4) CÀI & BUILD
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
-          npm run build
-
-          # 5) KHỞI ĐỘNG LẠI PM2
-          pm2 restart Client-Elavia --update-env || pm2 start "npm run start" --name Client-Elavia
-          pm2 save
-          '
+            # Pull image mới (latest trên nhánh main)
+            docker compose pull
+            docker compose up -d
+            docker image prune -f

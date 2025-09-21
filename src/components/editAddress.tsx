@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { City, District, Ward } from "../types/city";
 import axios from "axios";
 import { toast } from "react-toastify";
+import axiosInstance from "../services/axiosInstance";
 
 interface Props {
   address: any;
@@ -80,10 +81,8 @@ const EditAddressModal = ({
     };
 
     try {
-      await axios.put(
-        `${import.meta.env.VITE_API_URL}/auth/update-shipping-address/${
-          address._id
-        }`,
+      await axiosInstance.put(
+        `/auth/update-shipping-address/${address._id}`,
         payload,
         {
           headers: {
@@ -94,8 +93,8 @@ const EditAddressModal = ({
 
       // Nếu người dùng chọn làm mặc định thì gọi thêm API
       if (isDefault && address._id !== defaultAddressId) {
-        await axios.put(
-          `${import.meta.env.VITE_API_URL}/auth/address/default/${address._id}`,
+        await axiosInstance.put(
+          `/auth/address/default/${address._id}`,
           {},
           {
             headers: {

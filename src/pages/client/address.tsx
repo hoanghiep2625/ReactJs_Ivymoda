@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import EditAddressModal from "../../components/editAddress";
 import AddAddressModal from "../../components/addAddress";
+import axiosInstance from "../../services/axiosInstance";
 
 const AddressSchema = z.object({
   receiver_name: z.string().min(2, "Tên người nhận tối thiểu 2 ký tự"),
@@ -213,8 +214,8 @@ const Address = () => {
         return;
       }
 
-      await axios.put(
-        `${import.meta.env.VITE_API_URL}/auth/address/default/${id}`,
+      await axiosInstance.put(
+        `/auth/address/default/${id}`,
         {},
         {
           headers: {
@@ -238,7 +239,7 @@ const Address = () => {
         return;
       }
 
-      await axios.delete(`${import.meta.env.VITE_API_URL}/auth/address/${id}`, {
+      await axiosInstance.delete(`/auth/address/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

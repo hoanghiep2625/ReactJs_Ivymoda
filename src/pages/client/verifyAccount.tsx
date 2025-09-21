@@ -56,7 +56,7 @@ const VerifyAccount = () => {
     setIsSending(true);
     setError("");
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/auth/resend-code`, {
+      await axiosInstance.post(`/auth/resend-code`, {
         email,
       });
       setMessage(true);
@@ -73,18 +73,15 @@ const VerifyAccount = () => {
     e.preventDefault();
     setError("");
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/verify`,
-        { email, code }
-      );
+      const res = await axiosInstance.post(`/auth/verify`, { email, code });
 
       const tempAuth = localStorage.getItem("temp_auth");
       if (tempAuth) {
         const { email, password } = JSON.parse(tempAuth);
-        const loginRes = await axios.post(
-          `${import.meta.env.VITE_API_URL}/auth/login`,
-          { email, password }
-        );
+        const loginRes = await axiosInstance.post(`/auth/login`, {
+          email,
+          password,
+        });
 
         const token = loginRes.data?.user?.token;
         localStorage.setItem("token", token);

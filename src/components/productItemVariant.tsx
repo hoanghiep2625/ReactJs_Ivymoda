@@ -10,6 +10,7 @@ import { useAddToCart } from "../hooks/useAddToCart";
 import { useAuth } from "../context/auth.context";
 import { toast } from "react-toastify";
 import { Check, Heart } from "lucide-react";
+import axiosInstance from "../services/axiosInstance";
 
 interface ProductVariantWithDetails {
   _id: string;
@@ -70,23 +71,17 @@ const ProductItemVariantForm: React.FC<ProductItemFormProps> = ({
     productId: string,
     actualColor: string
   ) => {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/product-variants/by-color`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ productId, actualColor }),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Không tìm thấy biến thể");
+    try {
+      const response = await axiosInstance.post("/product-variants/by-color", {
+        productId,
+        actualColor,
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || "Không tìm thấy biến thể"
+      );
     }
-
-    const variant = await response.json();
-    return variant;
   };
 
   const [colorsByProductId, setColorsByProductId] = useState<{
@@ -100,29 +95,17 @@ const ProductItemVariantForm: React.FC<ProductItemFormProps> = ({
 
   const fetchColorsByProductId = async (productId: string) => {
     try {
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/product-variants/colors-product/${productId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ productId }),
-        }
+      const response = await axiosInstance.post(
+        `/product-variants/colors-product/${productId}`,
+        { productId }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch colors");
-      }
-
-      const colors: Color[] = await response.json();
+      const colors: Color[] = response.data;
       setColorsByProductId((prev) => ({
         ...prev,
         [productId]: colors,
       }));
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching colors:", error);
       setFetchError("Lỗi khi tải màu sắc sản phẩm!");
     }

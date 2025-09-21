@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { City, District, Ward } from "../types/city";
 import axios from "axios";
 import { toast } from "react-toastify";
+import axiosInstance from "../services/axiosInstance";
 
 interface Props {
   defaultAddressId: string | null;
@@ -70,8 +71,8 @@ const AddAddressModal = ({ defaultAddressId, onClose, onSuccess }: Props) => {
 
     try {
       // Gửi request thêm địa chỉ
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/add-shipping-address`,
+      const res = await axiosInstance.post(
+        `/auth/add-shipping-address`,
         payload,
         {
           headers: {
@@ -84,8 +85,8 @@ const AddAddressModal = ({ defaultAddressId, onClose, onSuccess }: Props) => {
       const newAddressId = newAddresses?.[newAddresses.length - 1]?._id;
 
       if ((isDefault || !defaultAddressId) && newAddressId) {
-        await axios.put(
-          `${import.meta.env.VITE_API_URL}/auth/address/default/${newAddressId}`,
+        await axiosInstance.put(
+          `/auth/address/default/${newAddressId}`,
           {},
           {
             headers: {

@@ -8,6 +8,7 @@ import useCartQuantity from "../hooks/useCartQuantity";
 import { getList } from "../api/provider";
 import Loading from "../components/loading";
 import { Phone, User, ShoppingBag } from "lucide-react";
+import axiosInstance from "../services/axiosInstance";
 
 // Định nghĩa kiểu dữ liệu cho danh mục
 interface Category {
@@ -100,23 +101,18 @@ const MenuClient = () => {
 
     setIsSearching(true);
     try {
-      const endpoint = import.meta.env.VITE_API_URL;
-      console.log("API Endpoint:", endpoint);
-      const res = await fetch(`${endpoint}/ai/search-suggestions`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: query.trim() }),
+      const response = await axiosInstance.post("/ai/search-suggestions", {
+        query: query.trim(),
       });
-      const data = await res.json();
 
-      if (data.suggestions && data.suggestions.length > 0) {
-        setSuggestions(data.suggestions.slice(0, 5)); // Giới hạn 5 gợi ý
+      if (response.data.suggestions && response.data.suggestions.length > 0) {
+        setSuggestions(response.data.suggestions.slice(0, 5)); // Giới hạn 5 gợi ý
         setShowSuggestions(true);
       } else {
         setSuggestions([]);
         setShowSuggestions(false);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Lỗi khi tìm kiếm gợi ý:", error);
       setSuggestions([]);
       setShowSuggestions(false);

@@ -3,8 +3,6 @@ import { Login, RegisterForm } from "../types/user";
 import axiosInstance from "../services/axiosInstance";
 import { CartData, CartItem, ICartItem } from "../types/cart";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 export const login = async (data: Login) => {
   const res = await axiosInstance.post("/auth/login", data);
   return res.data;
@@ -20,15 +18,11 @@ export const info = async () => {
 export const register = async (
   userData: RegisterForm
 ): Promise<RegisterForm> => {
-  const response = await axiosInstance.post("/auth/register", userData, {
-    headers: { "Content-Type": "application/json" },
-  });
+  const response = await axiosInstance.post("/auth/register", userData);
   return response.data;
 };
 export const addToCart = async (cartItem: CartItem): Promise<any> => {
-  const response = await axiosInstance.post("/cart/add", cartItem, {
-    headers: { "Content-Type": "application/json" },
-  });
+  const response = await axiosInstance.post("/cart/add", cartItem);
   return response.data;
 };
 export const deleteCart = async (
@@ -36,11 +30,11 @@ export const deleteCart = async (
   productVariantId: string,
   size: string
 ): Promise<any> => {
-  const response = await axiosInstance.post(
-    `/cart/remove`,
-    { userId, productVariantId, size },
-    { headers: { "Content-Type": "application/json" } } // Headers để tách riêng
-  );
+  const response = await axiosInstance.post(`/cart/remove`, {
+    userId,
+    productVariantId,
+    size,
+  });
   return response.data;
 };
 export const updateCartQuantity = async (
@@ -49,10 +43,11 @@ export const updateCartQuantity = async (
   size: string,
   quantity: number
 ): Promise<any> => {
-  const response = await axiosInstance.post(
-    `/cart/update`,
-    { userId, productVariantId, size, quantity },
-    { headers: { "Content-Type": "application/json" } }
-  );
+  const response = await axiosInstance.post(`/cart/update`, {
+    userId,
+    productVariantId,
+    size,
+    quantity,
+  });
   return response.data;
 };

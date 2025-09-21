@@ -8,14 +8,14 @@ export default defineConfig({
   },
   server: {
     host: "0.0.0.0", // Chạy trên tất cả các địa chỉ IP
-    port: 5173, // Port của dev server
+    port: 3000, // Port của dev server
     allowedHosts: [
       "elavia.tahoanghiep.com", // Thêm domain của bạn vào đây
     ],
   },
   preview: {
     host: "0.0.0.0",
-    port: 5173,
+    port: 3000,
     allowedHosts: ["elavia.tahoanghiep.com"],
   },
 });

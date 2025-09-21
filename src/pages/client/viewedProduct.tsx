@@ -54,18 +54,12 @@ const ViewedProducts = () => {
 
   const fetchColorsByProductId = async (productId: string) => {
     try {
-      const res = await fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/product-variants/colors-product/${productId}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ productId }),
-        }
+      const response = await axiosInstance.post(
+        `/product-variants/colors-product/${productId}`,
+        { productId }
       );
 
-      const colors: Color[] = await res.json();
+      const colors: Color[] = response.data;
       setColorsByProductId((prev) => ({ ...prev, [productId]: colors }));
     } catch (error) {
       console.error("Lỗi lấy màu:", error);
@@ -77,11 +71,17 @@ const ViewedProducts = () => {
     try {
       setLoading(true);
       // Gọi đúng endpoint RESTful, truyền page & limit qua query string
-      const res = await axiosInstance.get(`/product-variants/recently-viewed?page=${page}&limit=12`);
+      const res = await axiosInstance.get(
+        `/product-variants/recently-viewed?page=${page}&limit=12`
+      );
       setProducts(res.data.data || res.data); // tuỳ BE trả về
-      setTotalPages(res.data.totalPages || Math.ceil((res.data.total || 0) / 12));
+      setTotalPages(
+        res.data.totalPages || Math.ceil((res.data.total || 0) / 12)
+      );
       setCurrentPage(res.data.currentPage || page);
-      setTotalItems(res.data.total || (res.data.data ? res.data.data.length : 0));
+      setTotalItems(
+        res.data.total || (res.data.data ? res.data.data.length : 0)
+      );
     } catch (error) {
       setProducts([]);
       setTotalPages(0);
@@ -139,20 +139,22 @@ const ViewedProducts = () => {
                   >
                     &laquo;
                   </button>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                    <button
-                      key={p}
-                      onClick={() => fetchProducts(p)}
-                      className={`w-9 h-9 border rounded-tl-lg rounded-br-lg transition-all duration-300 ${
-                        currentPage === p
-                          ? "bg-black text-white border-black cursor-default"
-                          : "bg-white text-black border-black hover:bg-black hover:text-white"
-                      }`}
-                      disabled={currentPage === p}
-                    >
-                      {p}
-                    </button>
-                  ))}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (p) => (
+                      <button
+                        key={p}
+                        onClick={() => fetchProducts(p)}
+                        className={`w-9 h-9 border rounded-tl-lg rounded-br-lg transition-all duration-300 ${
+                          currentPage === p
+                            ? "bg-black text-white border-black cursor-default"
+                            : "bg-white text-black border-black hover:bg-black hover:text-white"
+                        }`}
+                        disabled={currentPage === p}
+                      >
+                        {p}
+                      </button>
+                    )
+                  )}
                   <button
                     onClick={() => fetchProducts(currentPage + 1)}
                     className="w-9 h-9 border border-black rounded-tl-lg rounded-br-lg transition-all duration-300 bg-white text-black hover:bg-black hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"

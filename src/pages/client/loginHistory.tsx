@@ -24,14 +24,11 @@ const LoginHistory = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await axiosInstance.get(
-          `${import.meta.env.VITE_API_URL}/auth/login-history`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const res = await axiosInstance.get(`/auth/login-history`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
         const json = await res.data;
         setLoginHistory(json.data);
         setTotal(json.total);
