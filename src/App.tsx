@@ -28,7 +28,7 @@ import ForgotPasswordWithCaptcha from "./pages/client/forgotPassWord";
 import ResetPassword from "./pages/client/resetPassWord";
 import NewArrivalProducts from "./pages/client/newArrivalProducts";
 import ChatBox from "./components/ChatBox";
-
+ 
 function App() {
   const DetailProductWrapper = () => {
     const { id } = useParams();
