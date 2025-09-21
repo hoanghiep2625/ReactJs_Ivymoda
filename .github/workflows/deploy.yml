@@ -33,7 +33,11 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
+            # Giữ short: sha-<7>
             type=sha
+            # Thêm full SHA để khớp với sed ở deploy:
+            type=sha,format=long,prefix=
+            # (tuỳ) latest cho nhánh default:
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Docker image
